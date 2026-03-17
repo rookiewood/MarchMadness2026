@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>March Madness Tracker 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #E8520A;
+    --orange-dim: #B8400A;
+    --gold: #F5C842;
+    --dark: #0D0D0D;
+    --dark2: #161616;
+    --dark3: #1F1F1F;
+    --dark4: #2A2A2A;
+    --mid: #3A3A3A;
+    --muted: #888;
+    --light: #DEDEDE;
+    --white: #F5F5F0;
+    --green: #2ECC71;
+    --red: #E74C3C;
+    --blue: #3B8BEB;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--dark); color: var(--white); font-family: 'Barlow', sans-serif; min-height: 100vh; }
+
+  .site-header {
+    background: var(--dark2);
+    border-bottom: 1px solid var(--dark4);
+    padding: 0 1.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px; position: sticky; top: 0; z-index: 100;
+  }
+  .site-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .site-title span { color: var(--orange); }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .round-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .main { max-width: 1300px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+  /* TABS */
+  .tabs {
+    display: flex; gap: 2px; margin-bottom: 1.5rem;
+    background: var(--dark2); border-radius: 6px; padding: 4px;
+  }
+  .tab-btn {
+    flex: 1; background: transparent; border: none; color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; padding: 8px; border-radius: 4px;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .tab-btn.active { background: var(--dark4); color: var(--white); }
+  .tab-btn:hover:not(.active) { color: var(--light); }
+
+  /* STANDINGS */
+  .standings-card {
+    background: var(--dark2); border: 1px solid var(--dark4); border-radius: 6px;
+    overflow: hidden; margin-bottom: 1.5rem;
+  }
+  .standings-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 16px; border-bottom: 1px solid var(--dark4);
+    transition: background 0.1s;
+  }
+  .standings-row:last-child { border-bottom: none; }
+  .standings-row:hover { background: var(--dark3); }
+  .standings-row.leader { background: #1a1f14; }
+  .rank { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800; color: var(--muted); width: 28px; text-align: center; }
+  .rank.gold { color: var(--gold); }
+  .rank.silver { color: #aaa; }
+  .rank.bronze { color: #cd7f32; }
+  .player-name-st { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; text-transform: uppercase; flex: 1; }
+  .score-big { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 800; color: var(--gold); min-width: 64px; text-align: right; }
+  .score-detail { font-size: 12px; color: var(--muted); text-align: right; min-width: 120px; }
+  .leader-tag {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    background: var(--gold); color: #111; padding: 2px 8px; border-radius: 3px;
+  }
+  .elim-tag {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    background: var(--dark4); color: var(--muted); padding: 2px 8px; border-radius: 3px;
+  }
+
+  /* SCORE ENTRY */
+  .rounds-grid { display: flex; flex-direction: column; gap: 1.5rem; }
+  .round-block { background: var(--dark2); border: 1px solid var(--dark4); border-radius: 6px; overflow: hidden; }
+  .round-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px; background: var(--dark3); border-bottom: 1px solid var(--dark4);
+  }
+  .round-title { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+  .round-pts-note { font-size: 12px; color: var(--muted); }
+  .teams-entry-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  .team-entry-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-bottom: 1px solid var(--dark4); border-right: 1px solid var(--dark4);
+  }
+  .team-entry-row:nth-child(even) { }
+  .seed-dot {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--dark4);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; color: var(--muted);
+    flex-shrink: 0;
+  }
+  .te-info { flex: 1; min-width: 0; }
+  .te-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .te-owner { font-size: 11px; color: var(--muted); }
+  .wins-control { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .win-btn {
+    width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--dark4);
+    background: transparent; color: var(--muted); font-size: 16px; line-height: 1;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+  }
+  .win-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .win-btn:active { transform: scale(0.92); }
+  .win-count { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; min-width: 18px; text-align: center; }
+  .win-pts { font-size: 11px; color: var(--gold); min-width: 36px; text-align: right; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; }
+  .te-elim { font-size: 11px; color: var(--muted); font-style: italic; }
+
+  /* PLAYER DETAIL */
+  .player-detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+  .player-detail-card { background: var(--dark2); border: 1px solid var(--dark4); border-radius: 6px; overflow: hidden; }
+  .pd-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; background: var(--dark3); border-bottom: 1px solid var(--dark4);
+  }
+  .pd-name { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; text-transform: uppercase; flex: 1; }
+  .pd-score { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800; color: var(--gold); }
+  .pd-team-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 14px; border-bottom: 1px solid var(--dark4); font-size: 13px;
+  }
+  .pd-team-row:last-child { border-bottom: none; }
+  .pd-team-row.eliminated { opacity: 0.4; }
+  .pd-team-name { flex: 1; }
+  .pd-team-wins { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; color: var(--muted); }
+  .pd-team-pts { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; color: var(--gold); min-width: 40px; text-align: right; }
+  .pd-team-pts.zero { color: var(--muted); font-weight: 400; }
+
+  /* SAVE INDICATOR */
+  .save-indicator {
+    position: fixed; bottom: 16px; right: 16px;
+    background: var(--dark3); border: 1px solid var(--dark4); border-radius: 5px;
+    padding: 8px 14px; font-size: 12px; color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    opacity: 0; transition: opacity 0.3s; z-index: 300;
+  }
+  .save-indicator.show { opacity: 1; }
+
+  /* MAX POSSIBLE */
+  .max-possible { font-size: 11px; color: var(--muted); }
+
+  @media (max-width: 600px) {
+    .site-header { padding: 0 1rem; }
+    .main { padding: 1rem 0.75rem; }
+    .score-detail { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-title">March <span>Madness</span> <span style="color:var(--muted);font-weight:400;font-size:16px">2026 Tracker</span></div>
+  <div class="header-right">
+    <span class="round-label" id="current-round-label">Round of 64</span>
+  </div>
+</header>
+
+<div class="main">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('standings',this)">Standings</button>
+    <button class="tab-btn" onclick="switchTab('scores',this)">Enter Scores</button>
+    <button class="tab-btn" onclick="switchTab('players',this)">By Player</button>
+  </div>
+
+  <div id="tab-standings"></div>
+  <div id="tab-scores" style="display:none"></div>
+  <div id="tab-players" style="display:none"></div>
+</div>
+
+<div class="save-indicator" id="save-indicator">Saved</div>
+
+<script>
+const STORAGE_KEY = 'mm_tracker_2026_v1';
+
+// All 64 teams with seed, region, and owner from the finalized draft
+const TEAMS = [
+  // ROBERT (Pick #1)
+  {seed:1, name:"Arizona",        region:"West",    owner:"Robert"},
+  {seed:2, name:"Purdue",         region:"West",    owner:"Robert"},
+  {seed:14,name:"Penn",           region:"South",   owner:"Robert"},
+  {seed:5, name:"St. John's",     region:"East",    owner:"Robert"},
+  {seed:2, name:"Iowa St.",       region:"Midwest", owner:"Robert"},
+  {seed:1, name:"Duke",           region:"East",    owner:"Robert"},
+  {seed:14,name:"North Dakota St.",region:"East",   owner:"Robert"},
+  {seed:16,name:"UMBC/Howard",    region:"Midwest", owner:"Robert"},
+
+  // ERNESTO (Pick #2)
+  {seed:12,name:"Akron",          region:"Midwest", owner:"Ernesto"},
+  {seed:8, name:"Georgia",        region:"Midwest", owner:"Ernesto"},
+  {seed:8, name:"Ohio St.",       region:"East",    owner:"Ernesto"},
+  {seed:6, name:"Tennessee",      region:"Midwest", owner:"Ernesto"},
+  {seed:4, name:"Alabama",        region:"Midwest", owner:"Ernesto"},
+  {seed:13,name:"Cal Baptist",    region:"East",    owner:"Ernesto"},
+  {seed:13,name:"Hawaii",         region:"West",    owner:"Ernesto"},
+  {seed:16,name:"Siena",          region:"East",    owner:"Ernesto"},
+
+  // EFREN (Pick #3)
+  {seed:12,name:"High Point",     region:"West",    owner:"Efren"},
+  {seed:8, name:"Clemson",        region:"South",   owner:"Efren"},
+  {seed:8, name:"Villanova",      region:"West",    owner:"Efren"},
+  {seed:6, name:"North Carolina", region:"South",   owner:"Efren"},
+  {seed:4, name:"Arkansas",       region:"West",    owner:"Efren"},
+  {seed:2, name:"UConn",          region:"East",    owner:"Efren"},
+  {seed:13,name:"Hofstra",        region:"Midwest", owner:"Efren"},
+  {seed:16,name:"Pra. View/Lehigh",region:"South",  owner:"Efren"},
+
+  // JAMES (Pick #4)
+  {seed:12,name:"McNeese",        region:"South",   owner:"James"},
+  {seed:10,name:"UCF",            region:"East",    owner:"James"},
+  {seed:9, name:"Iowa",           region:"South",   owner:"James"},
+  {seed:6, name:"Louisville",     region:"East",    owner:"James"},
+  {seed:4, name:"Kansas",         region:"East",    owner:"James"},
+  {seed:2, name:"Houston",        region:"South",   owner:"James"},
+  {seed:13,name:"Troy",           region:"South",   owner:"James"},
+  {seed:16,name:"LIU",            region:"West",    owner:"James"},
+
+  // ANTONIO (Pick #5)
+  {seed:12,name:"Northern Iowa",  region:"East",    owner:"Antonio"},
+  {seed:10,name:"Texas A&M",      region:"South",   owner:"Antonio"},
+  {seed:9, name:"Saint Louis",    region:"Midwest", owner:"Antonio"},
+  {seed:6, name:"BYU",            region:"West",    owner:"Antonio"},
+  {seed:4, name:"Nebraska",       region:"South",   owner:"Antonio"},
+  {seed:5, name:"Wisconsin",      region:"West",    owner:"Antonio"},
+  {seed:1, name:"Florida",        region:"South",   owner:"Antonio"},
+  {seed:15,name:"Tennessee St.",  region:"Midwest", owner:"Antonio"},
+
+  // LUIS C (Pick #6)
+  {seed:11,name:"SMU/Miami (OH)", region:"Midwest", owner:"Luis C"},
+  {seed:10,name:"Santa Clara",    region:"Midwest", owner:"Luis C"},
+  {seed:9, name:"TCU",            region:"East",    owner:"Luis C"},
+  {seed:7, name:"UCLA",           region:"East",    owner:"Luis C"},
+  {seed:3, name:"Gonzaga",        region:"West",    owner:"Luis C"},
+  {seed:5, name:"Vanderbilt",     region:"South",   owner:"Luis C"},
+  {seed:1, name:"Michigan",       region:"Midwest", owner:"Luis C"},
+  {seed:15,name:"Queens",         region:"West",    owner:"Luis C"},
+
+  // ARTURO (Pick #7)
+  {seed:11,name:"South Florida",  region:"East",    owner:"Arturo"},
+  {seed:10,name:"Missouri",       region:"West",    owner:"Arturo"},
+  {seed:9, name:"Utah St.",       region:"West",    owner:"Arturo"},
+  {seed:7, name:"Saint Mary's",   region:"South",   owner:"Arturo"},
+  {seed:3, name:"Illinois",       region:"South",   owner:"Arturo"},
+  {seed:5, name:"Texas Tech",     region:"Midwest", owner:"Arturo"},
+  {seed:14,name:"Kennesaw St.",   region:"West",    owner:"Arturo"},
+  {seed:15,name:"Idaho",          region:"South",   owner:"Arturo"},
+
+  // ALBERT (Pick #8)
+  {seed:11,name:"Texas/NC State", region:"West",    owner:"Albert"},
+  {seed:11,name:"VCU",            region:"South",   owner:"Albert"},
+  {seed:7, name:"Kentucky",       region:"Midwest", owner:"Albert"},
+  {seed:7, name:"Miami (FL)",     region:"West",    owner:"Albert"},
+  {seed:3, name:"Michigan St.",   region:"East",    owner:"Albert"},
+  {seed:3, name:"Virginia",       region:"Midwest", owner:"Albert"},
+  {seed:14,name:"Wright St.",     region:"Midwest", owner:"Albert"},
+  {seed:15,name:"Furman",         region:"East",    owner:"Albert"},
+];
+
+const PLAYERS = ["Robert","Ernesto","Efren","James","Antonio","Luis C","Arturo","Albert"];
+
+const ROUNDS = [
+  { id:'r64',  label:'Round of 64',    short:'R64',  maxWins:1 },
+  { id:'r32',  label:'Round of 32',    short:'R32',  maxWins:2 },
+  { id:'s16',  label:'Sweet 16',       short:'S16',  maxWins:3 },
+  { id:'e8',   label:'Elite Eight',    short:'E8',   maxWins:4 },
+  { id:'f4',   label:'Final Four',     short:'F4',   maxWins:5 },
+  { id:'ncg',  label:'Championship',   short:'NCG',  maxWins:6 },
+];
+
+// wins[teamKey] = total wins (0-6)
+// eliminated[teamKey] = bool
+let winsData = {};
+let elimData = {};
+let activeTab = 'standings';
+
+function teamKey(t) { return `${t.region}-${t.seed}-${t.name}`; }
+
+function getWins(t) { return winsData[teamKey(t)] || 0; }
+function isElim(t)  { return !!elimData[teamKey(t)]; }
+function teamScore(t) { return t.seed * getWins(t); }
+
+function playerScore(player) {
+  return TEAMS.filter(t => t.owner === player).reduce((s,t) => s + teamScore(t), 0);
+}
+
+function playerTeams(player) {
+  return TEAMS.filter(t => t.owner === player);
+}
+
+// Max possible remaining points for a player (teams still alive * seed * max remaining wins)
+function playerMaxPossible(player) {
+  return TEAMS.filter(t => t.owner === player && !isElim(t)).reduce((s,t) => {
+    const maxWins = 6; // championship winner
+    const remaining = maxWins - getWins(t);
+    return s + t.seed * (getWins(t) + remaining);
+  }, 0);
+}
+
+function saveState() {
+  try {
+    window.storage.set(STORAGE_KEY, JSON.stringify({winsData, elimData})).catch(()=>{});
+    const el = document.getElementById('save-indicator');
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 1800);
+  } catch(e) {}
+}
+
+async function loadState() {
+  try {
+    const result = await window.storage.get(STORAGE_KEY);
+    if (result && result.value) {
+      const d = JSON.parse(result.value);
+      winsData = d.winsData || {};
+      elimData = d.elimData || {};
+    }
+  } catch(e) {}
+  render();
+}
+
+function setWins(t, val) {
+  const k = teamKey(t);
+  const clamped = Math.max(0, Math.min(6, val));
+  winsData[k] = clamped;
+  if (clamped === 0) { delete elimData[k]; }
+  saveState();
+  render();
+}
+
+function toggleElim(t) {
+  const k = teamKey(t);
+  elimData[k] = !elimData[k];
+  saveState();
+  render();
+}
+
+function render() {
+  if (activeTab === 'standings') renderStandings();
+  if (activeTab === 'scores')    renderScores();
+  if (activeTab === 'players')   renderPlayers();
+}
+
+function renderStandings() {
+  const el = document.getElementById('tab-standings');
+  const sorted = [...PLAYERS].sort((a,b) => playerScore(b) - playerScore(a));
+  const topScore = playerScore(sorted[0]);
+
+  const rows = sorted.map((player, i) => {
+    const score = playerScore(player);
+    const maxPoss = playerMaxPossible(player);
+    const pts = playerTeams(player);
+    const activeTeams = pts.filter(t => !isElim(t)).length;
+    const scoringTeams = pts.filter(t => getWins(t) > 0).length;
+    const isLeader = i === 0 && score > 0;
+    let rankClass = '';
+    if (i === 0) rankClass = 'gold';
+    else if (i === 1) rankClass = 'silver';
+    else if (i === 2) rankClass = 'bronze';
+
+    return `<div class="standings-row${isLeader ? ' leader' : ''}">
+      <div class="rank ${rankClass}">${i+1}</div>
+      <div class="player-name-st">${player}</div>
+      ${isLeader && score > 0 ? '<span class="leader-tag">Leading</span>' : ''}
+      <div class="score-detail">
+        ${activeTeams} alive &nbsp;·&nbsp; max ${maxPoss} pts
+      </div>
+      <div class="score-big">${score}</div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div style="margin-bottom:8px">
+      <div class="standings-card">${rows}</div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);text-align:right;margin-bottom:1.5rem">
+      Scoring: seed × wins &nbsp;·&nbsp; Max possible assumes all surviving teams win remaining games
+    </div>
+    ${renderMiniBoards()}`;
+}
+
+function renderMiniBoards() {
+  const sorted = [...PLAYERS].sort((a,b) => playerScore(b) - playerScore(a));
+  const cards = sorted.map(player => {
+    const pts = playerTeams(player).sort((a,b) => teamScore(b) - teamScore(a));
+    const rows = pts.map(t => {
+      const wins = getWins(t);
+      const pts_val = teamScore(t);
+      const elim = isElim(t);
+      return `<div class="pd-team-row${elim ? ' eliminated' : ''}">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--muted);width:20px">${t.seed}</span>
+        <span class="pd-team-name">${t.name}</span>
+        <span class="pd-team-wins">${wins}W</span>
+        <span class="pd-team-pts ${pts_val===0?'zero':''}">${pts_val > 0 ? pts_val+' pts' : '—'}</span>
+      </div>`;
+    }).join('');
+    return `<div class="player-detail-card">
+      <div class="pd-header">
+        <div class="pd-name">${player}</div>
+        <div class="pd-score">${playerScore(player)} pts</div>
+      </div>
+      ${rows}
+    </div>`;
+  }).join('');
+  return `<div class="player-detail-grid">${cards}</div>`;
+}
+
+function renderScores() {
+  const el = document.getElementById('tab-scores');
+
+  // Group all teams into rounds based on wins (a team with 3 wins won R64, R32, S16)
+  // Show all teams sorted by seed, grouped into round blocks for easy entry
+  // Each block shows which teams have exactly N wins (won that round)
+
+  const blocks = ROUNDS.map(round => {
+    const roundIdx = ROUNDS.indexOf(round); // 0=R64 needs >=1 win to have won
+    const allTeamRows = [...TEAMS].sort((a,b) => a.seed - b.seed || a.name.localeCompare(b.name)).map(t => {
+      const wins = getWins(t);
+      const elim = isElim(t);
+      const pts = teamScore(t);
+      const k = teamKey(t);
+      const canIncrement = wins < 6 && !elim;
+      const canDecrement = wins > 0;
+
+      return `<div class="team-entry-row">
+        <div class="seed-dot">${t.seed}</div>
+        <div class="te-info">
+          <div class="te-name">${t.name}</div>
+          <div class="te-owner">${t.owner}</div>
+        </div>
+        <div class="wins-control">
+          <button class="win-btn" onclick="adjustWins('${k}', -1)" ${canDecrement ? '' : 'disabled style="opacity:0.2;cursor:default"'}>−</button>
+          <span class="win-count" style="color:${wins>0?'var(--white)':'var(--muted)'}">${wins}</span>
+          <button class="win-btn" onclick="adjustWins('${k}', 1)" ${canIncrement ? '' : 'disabled style="opacity:0.2;cursor:default"'}>+</button>
+        </div>
+        <div class="win-pts">${pts > 0 ? pts+'pts' : ''}</div>
+        <button onclick="toggleElimKey('${k}')" style="background:transparent;border:1px solid var(--dark4);border-radius:4px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:3px 8px;cursor:pointer;flex-shrink:0;transition:all 0.15s;${elim?'border-color:#c0392b;color:#e74c3c':''}" 
+          onmouseover="this.style.borderColor=this.classList.contains('elim')?'#888':'#c0392b'" >
+          ${elim ? 'OUT' : 'Elim'}
+        </button>
+      </div>`;
+    }).join('');
+
+    return `<div class="round-block">
+      <div class="round-header">
+        <div class="round-title">${round.label}</div>
+        <div class="round-pts-note">Points awarded when a team wins in this round</div>
+      </div>
+      <div style="padding:10px 14px;border-bottom:1px solid var(--dark4);background:var(--dark3);font-size:12px;color:var(--muted)">
+        Use + / − to set total wins per team. Mark eliminated teams with "Elim".
+      </div>
+      <div class="teams-entry-grid">${allTeamRows}</div>
+    </div>`;
+  });
+
+  // Actually just show ONE unified grid instead of repeating per round
+  const allTeamRows = [...TEAMS].sort((a,b) => {
+    if (a.owner !== b.owner) return PLAYERS.indexOf(a.owner) - PLAYERS.indexOf(b.owner);
+    return a.seed - b.seed;
+  }).map(t => {
+    const wins = getWins(t);
+    const elim = isElim(t);
+    const pts = teamScore(t);
+    const k = teamKey(t);
+    const canIncrement = wins < 6 && !elim;
+    const canDecrement = wins > 0;
+
+    return `<div class="team-entry-row">
+      <div class="seed-dot" style="${wins>0?'background:#1a2a1a;color:var(--green)':''}">${t.seed}</div>
+      <div class="te-info">
+        <div class="te-name">${t.name}</div>
+        <div class="te-owner" style="color:${elim?'var(--muted)':'var(--orange)'}">${t.owner}${elim?' · OUT':''}</div>
+      </div>
+      <div class="wins-control">
+        <button class="win-btn" onclick="adjustWins('${k}', -1)" ${canDecrement ? '' : 'disabled style="opacity:0.2;cursor:default"'}>−</button>
+        <span class="win-count" style="color:${wins>0?'var(--white)':'var(--muted)'}">${wins}</span>
+        <button class="win-btn" onclick="adjustWins('${k}', 1)" ${canIncrement ? '' : 'disabled style="opacity:0.2;cursor:default"'}>+</button>
+      </div>
+      <div class="win-pts">${pts > 0 ? pts+' pts' : ''}</div>
+      <button onclick="toggleElimKey('${k}')" 
+        style="background:transparent;border:1px solid ${elim?'#c0392b':'var(--dark4)'};border-radius:4px;color:${elim?'#e74c3c':'var(--muted)'};font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:3px 8px;cursor:pointer;flex-shrink:0;transition:all 0.15s">
+        ${elim ? 'OUT' : 'Elim'}
+      </button>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div style="margin-bottom:10px;font-size:13px;color:var(--muted)">
+      Set total wins per team with + / −. Mark eliminated teams. Scores update live.
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap" id="score-filter-bar">
+      <span style="font-size:12px;color:var(--muted);align-self:center">Filter:</span>
+      ${PLAYERS.map(p => `<button class="rfbtn-s active-s" data-player="${p}" onclick="toggleScoreFilter('${p}',this)" 
+        style="background:var(--dark3);border:1px solid var(--dark4);border-radius:4px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:5px 10px;cursor:pointer;transition:all 0.15s">${p}</button>`).join('')}
+      <button onclick="resetAllWins()" style="margin-left:auto;background:transparent;border:1px solid var(--dark4);border-radius:4px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:5px 10px;cursor:pointer;transition:all 0.15s">Reset all</button>
+    </div>
+    <div class="round-block">
+      <div class="round-header">
+        <div class="round-title">All Teams — Win Tracker</div>
+        <div class="round-pts-note">Score = seed × total wins</div>
+      </div>
+      <div class="teams-entry-grid" id="score-entry-grid">${allTeamRows}</div>
+    </div>`;
+}
+
+function renderPlayers() {
+  const el = document.getElementById('tab-players');
+  const sorted = [...PLAYERS].sort((a,b) => playerScore(b) - playerScore(a));
+  const cards = sorted.map((player, rank) => {
+    const pts = playerTeams(player).sort((a,b) => teamScore(b) - teamScore(a));
+    const totalScore = playerScore(player);
+    const rows = pts.map(t => {
+      const wins = getWins(t);
+      const ptsVal = teamScore(t);
+      const elim = isElim(t);
+      const roundWon = wins > 0 ? ROUNDS[Math.min(wins-1, 5)].short : '';
+      return `<div class="pd-team-row${elim ? ' eliminated' : ''}">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--muted);width:20px;flex-shrink:0">${t.seed}</span>
+        <span class="pd-team-name">${t.name}<span style="font-size:10px;color:var(--muted);margin-left:4px">${t.region}</span></span>
+        <span class="pd-team-wins">${wins > 0 ? wins+'W' : elim ? 'OUT' : '—'}</span>
+        <span class="pd-team-pts ${ptsVal===0?'zero':''}">${ptsVal > 0 ? ptsVal+' pts' : ''}</span>
+      </div>`;
+    }).join('');
+
+    let rankLabel = '';
+    if (rank === 0) rankLabel = `<span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;background:var(--gold);color:#111;padding:2px 8px;border-radius:3px">1st</span>`;
+    else if (rank === 1) rankLabel = `<span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;background:#aaa;color:#111;padding:2px 8px;border-radius:3px">2nd</span>`;
+    else if (rank === 2) rankLabel = `<span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;background:#cd7f32;color:#111;padding:2px 8px;border-radius:3px">3rd</span>`;
+
+    return `<div class="player-detail-card">
+      <div class="pd-header">
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:2px">Pick #${PLAYERS.indexOf(player)+1}</div>
+          <div class="pd-name">${player} ${rankLabel||''}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="pd-score">${totalScore} pts</div>
+          <div style="font-size:11px;color:var(--muted)">max ${playerMaxPossible(player)}</div>
+        </div>
+      </div>
+      ${rows}
+    </div>`;
+  }).join('');
+  el.innerHTML = `<div class="player-detail-grid">${cards}</div>`;
+}
+
+// Called from inline onclick using stored key
+function adjustWins(key, delta) {
+  const t = TEAMS.find(t => teamKey(t) === key);
+  if (!t) return;
+  const cur = getWins(t);
+  winsData[key] = Math.max(0, Math.min(6, cur + delta));
+  if (winsData[key] === 0) delete winsData[key];
+  saveState();
+  render();
+}
+
+function toggleElimKey(key) {
+  elimData[key] = !elimData[key];
+  saveState();
+  render();
+}
+
+function resetAllWins() {
+  if (!confirm('Reset all wins and eliminations to zero?')) return;
+  winsData = {};
+  elimData = {};
+  saveState();
+  render();
+}
+
+function switchTab(tab, el) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-standings').style.display = tab === 'standings' ? '' : 'none';
+  document.getElementById('tab-scores').style.display    = tab === 'scores'    ? '' : 'none';
+  document.getElementById('tab-players').style.display   = tab === 'players'   ? '' : 'none';
+  render();
+}
+
+// Poll every 10s for updates from other users
+setInterval(async () => {
+  try {
+    const result = await window.storage.get(STORAGE_KEY);
+    if (result && result.value) {
+      const d = JSON.parse(result.value);
+      const newWins = JSON.stringify(d.winsData||{});
+      if (newWins !== JSON.stringify(winsData)) {
+        winsData = d.winsData || {};
+        elimData = d.elimData || {};
+        render();
+      }
+    }
+  } catch(e) {}
+}, 10000);
+
+loadState();
+</script>
+</body>
+</html>
