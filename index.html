@@ -376,7 +376,16 @@ function saveConfig() {
 
 function initFirebase(config) {
   try {
-    const app = initializeApp(config);
+    const firebaseConfig = {
+    apiKey: "AIzaSyAenUZicTyg52LDQ1y-K1ngnvSbIFF7cdU",
+    authDomain: "marchmadness2026-232c7.firebaseapp.com",
+    databaseURL: "https://marchmadness2026-232c7-default-rtdb.firebaseio.com",
+    projectId: "marchmadness2026-232c7",
+    storageBucket: "marchmadness2026-232c7.firebasestorage.app",
+    messagingSenderId: "105483230366",
+    appId: "1:105483230366:web:2d0f21cc8fc737d7ae2f8f"
+  };
+    const app = initializeApp(firebaseConfig);
     db = getDatabase(app);
     dbRef = ref(db, 'tracker2026');
     setSyncStatus('connecting');
