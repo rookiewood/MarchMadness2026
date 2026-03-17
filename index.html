@@ -170,55 +170,6 @@
 </style>
 </head>
 <body>
-
-<!-- SETUP SCREEN (shown until Firebase config is entered) -->
-<div class="setup-screen" id="setup-screen">
-  <div class="setup-box">
-    <div class="setup-title">March <span>Madness</span> 2026</div>
-    <p class="setup-sub">
-      This tracker syncs live across all devices using Firebase. You only need to do this setup once —
-      after saving, the config is stored in your browser and this screen won't appear again.
-    </p>
-
-    <div class="setup-step">
-      <div class="step-num">Step 1 — Create a Firebase project</div>
-      <div class="step-text">
-        Go to <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a>,
-        click <strong>Add project</strong>, name it <code>march-madness-2026</code>, and click through the setup.
-        No need to enable Analytics.
-      </div>
-    </div>
-
-    <div class="setup-step">
-      <div class="step-num">Step 2 — Add a Realtime Database</div>
-      <div class="step-text">
-        In your project, go to <strong>Build → Realtime Database → Create Database</strong>.
-        Choose any location, then select <strong>Start in test mode</strong> (allows read/write for 30 days — plenty for the tournament).
-      </div>
-    </div>
-
-    <div class="setup-step">
-      <div class="step-num">Step 3 — Add a web app &amp; get your config</div>
-      <div class="step-text">
-        Go to <strong>Project Settings</strong> (gear icon) → <strong>Your apps → Add app → Web</strong>.
-        Register it, then copy the <code>firebaseConfig</code> object shown. Paste the entire object below.
-      </div>
-      <textarea class="config-input" id="firebase-config-input" placeholder='{
-  "apiKey": "AIzaSyAenUZicTyg52LDQ1y-K1ngnvSbIFF7cdU",
-  "authDomain": "marchmadness2026-232c7.firebaseapp.com",
-  "databaseURL": "https://marchmadness2026-232c7-default-rtdb.firebaseio.com",
-  "projectId": "marchmadness2026-232c7",
-  "storageBucket": "marchmadness2026-232c7.firebasestorage.app",
-  "messagingSenderId": "105483230366",
-  "appId": "1:105483230366:web:2d0f21cc8fc737d7ae2f8f"
-}'></textarea>
-    </div>
-
-    <div class="setup-error" id="setup-error"></div>
-    <button class="setup-btn" onclick="saveConfig()">Save &amp; Connect →</button>
-  </div>
-</div>
-
 <!-- MAIN APP (hidden until config is set) -->
 <div class="app" id="app">
   <header class="site-header">
