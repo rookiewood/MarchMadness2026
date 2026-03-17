@@ -171,56 +171,8 @@
 </head>
 <body>
 
-<!-- SETUP SCREEN (shown until Firebase config is entered) -->
-<div class="setup-screen" id="setup-screen">
-  <div class="setup-box">
-    <div class="setup-title">March <span>Madness</span> 2026</div>
-    <p class="setup-sub">
-      This tracker syncs live across all devices using Firebase. You only need to do this setup once —
-      after saving, the config is stored in your browser and this screen won't appear again.
-    </p>
-
-    <div class="setup-step">
-      <div class="step-num">Step 1 — Create a Firebase project</div>
-      <div class="step-text">
-        Go to <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a>,
-        click <strong>Add project</strong>, name it <code>march-madness-2026</code>, and click through the setup.
-        No need to enable Analytics.
-      </div>
-    </div>
-
-    <div class="setup-step">
-      <div class="step-num">Step 2 — Add a Realtime Database</div>
-      <div class="step-text">
-        In your project, go to <strong>Build → Realtime Database → Create Database</strong>.
-        Choose any location, then select <strong>Start in test mode</strong> (allows read/write for 30 days — plenty for the tournament).
-      </div>
-    </div>
-
-    <div class="setup-step">
-      <div class="step-num">Step 3 — Add a web app &amp; get your config</div>
-      <div class="step-text">
-        Go to <strong>Project Settings</strong> (gear icon) → <strong>Your apps → Add app → Web</strong>.
-        Register it, then copy the <code>firebaseConfig</code> object shown. Paste the entire object below.
-      </div>
-      <textarea class="config-input" id="firebase-config-input" placeholder='{
-  "apiKey": "AIza...",
-  "authDomain": "march-madness-2026.firebaseapp.com",
-  "databaseURL": "https://march-madness-2026-default-rtdb.firebaseio.com",
-  "projectId": "march-madness-2026",
-  "storageBucket": "march-madness-2026.appspot.com",
-  "messagingSenderId": "123456789",
-  "appId": "1:123..."
-}'></textarea>
-    </div>
-
-    <div class="setup-error" id="setup-error"></div>
-    <button class="setup-btn" onclick="saveConfig()">Save &amp; Connect →</button>
-  </div>
-</div>
-
-<!-- MAIN APP (hidden until config is set) -->
-<div class="app" id="app">
+<!-- MAIN APP -->
+<div class="app" id="app" style="display:block">
   <header class="site-header">
     <div class="site-title">March <span>Madness</span> <span style="color:var(--muted);font-weight:400;font-size:16px">2026 Tracker</span></div>
     <div style="display:flex;align-items:center;gap:6px">
@@ -323,7 +275,7 @@ let activeTab = 'standings';
 let db = null;
 let dbRef = null;
 let isSaving = false;
-const CONFIG_KEY = 'mm_firebase_config_2026';
+
 
 function teamKey(t) { return `${t.region}_${t.seed}_${t.name.replace(/[^a-zA-Z0-9]/g,'_')}`; }
 function getWins(t)  { return winsData[teamKey(t)] || 0; }
@@ -336,43 +288,7 @@ function playerMaxPossible(p){
 }
 
 // ── FIREBASE SETUP ──────────────────────────────────────────────────────────
-function parseFirebaseConfig(raw) {
-  // Strategy 1: straight JSON.parse after stripping JS wrapper
-  try {
-    const stripped = raw.replace(/^const\s+\w+\s*=\s*/, '').replace(/;\s*$/, '').trim();
-    return JSON.parse(stripped);
-  } catch(e) {}
-  // Strategy 2: extract key: "value" pairs directly — handles unquoted keys,
-  // single-quoted values, and condensed single-line format from Firebase console
-  const config = {};
-  const pattern = /([a-zA-Z0-9_]+)\s*:\s*["']([^"']+)["']/g;
-  let match;
-  while ((match = pattern.exec(raw)) !== null) {
-    config[match[1]] = match[2];
-  }
-  if (Object.keys(config).length >= 4) return config;
-  return null;
-}
 
-function saveConfig() {
-  const raw = document.getElementById('firebase-config-input').value.trim();
-  const errEl = document.getElementById('setup-error');
-  errEl.style.display = 'none';
-  let config;
-  try { config = parseFirebaseConfig(raw); } catch(e) { config = null; }
-  if (!config || Object.keys(config).length < 4) {
-    errEl.textContent = 'Could not parse the config. Paste the full firebaseConfig object — keys and values should be wrapped in quotes.';
-    errEl.style.display = 'block';
-    return;
-  }
-  if (!config.databaseURL) {
-    errEl.textContent = 'Missing databaseURL. Make sure your Firebase project has a Realtime Database created.';
-    errEl.style.display = 'block';
-    return;
-  }
-  localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-  initFirebase(config);
-}
 
 function initFirebase(config) {
   try {
@@ -388,7 +304,6 @@ function initFirebase(config) {
         elimData = data.elimData || {};
       }
       setSyncStatus('live');
-      showApp();
       render();
     }, (error) => {
       setSyncStatus('error');
@@ -397,14 +312,9 @@ function initFirebase(config) {
   } catch(e) {
     document.getElementById('setup-error').textContent = 'Firebase init failed: ' + e.message;
     document.getElementById('setup-error').style.display = 'block';
-    localStorage.removeItem(CONFIG_KEY);
   }
 }
 
-function showApp() {
-  document.getElementById('setup-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-}
 
 function setSyncStatus(status) {
   const dot = document.getElementById('sync-dot');
@@ -592,14 +502,19 @@ window.switchTab = function(tab, el) {
   render();
 };
 
-window.saveConfig = saveConfig;
 
-// ── BOOT ────────────────────────────────────────────────────────────────────
-const saved = localStorage.getItem(CONFIG_KEY);
-if (saved) {
-  try { initFirebase(JSON.parse(saved)); }
-  catch(e) { localStorage.removeItem(CONFIG_KEY); }
-}
+
+// ── BOOT — config hardcoded, no setup screen needed ─────────────────────
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBG-7ob_pE9VeISAQKe9GKWCBFYxovN2jU",
+  authDomain: "marchmadness2026-232c7.firebaseapp.com",
+  databaseURL: "https://marchmadness2026-232c7-default-rtdb.firebaseio.com",
+  projectId: "marchmadness2026-232c7",
+  storageBucket: "marchmadness2026-232c7.firebasestorage.app",
+  messagingSenderId: "105483230366",
+  appId: "1:105483230366:web:0ac944528fdc182aae2f8f"
+};
+initFirebase(FIREBASE_CONFIG);
 </script>
 </body>
 </html>
