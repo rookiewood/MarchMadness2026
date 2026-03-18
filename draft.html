@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>March Madness Draft 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #E8520A;
+    --orange-dim: #B8400A;
+    --gold: #F5C842;
+    --dark: #0D0D0D;
+    --dark2: #161616;
+    --dark3: #1F1F1F;
+    --dark4: #2A2A2A;
+    --mid: #3A3A3A;
+    --muted: #888;
+    --light: #DEDEDE;
+    --white: #F5F5F0;
+    --green: #2ECC71;
+    --blue: #3B8BEB;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; }
+  body {
+    background: var(--dark);
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .site-header {
+    background: var(--dark2);
+    border-bottom: 1px solid var(--dark4);
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .site-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--white);
+  }
+  .site-title span { color: var(--orange); }
+  .round-badge {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--orange);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 3px;
+  }
+  .round-badge.done { background: var(--green); }
+  .round-badge.waiting { background: var(--mid); color: var(--muted); }
+
+  /* LAYOUT */
+  .main { max-width: 1200px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+  /* ON CLOCK BANNER */
+  .on-clock-banner {
+    background: var(--orange);
+    border-radius: 6px;
+    padding: 14px 20px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .on-clock-banner .label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
+  .on-clock-banner .picker-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+  .on-clock-banner .pick-info {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: right;
+    opacity: 0.9;
+    white-space: nowrap;
+  }
+  .done-banner {
+    background: var(--dark3);
+    border: 1px solid var(--green);
+    border-radius: 6px;
+    padding: 14px 20px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--green);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 1.5rem;
+    background: var(--dark2);
+    border-radius: 6px;
+    padding: 4px;
+  }
+  .tab-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tab-btn.active {
+    background: var(--dark4);
+    color: var(--white);
+  }
+  .tab-btn:hover:not(.active) { color: var(--light); }
+
+  /* PICK SCREEN */
+  .pick-layout { display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; }
+  @media (max-width: 700px) { .pick-layout { grid-template-columns: 1fr; } }
+
+  .section-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  /* SEARCH + FILTER */
+  .search-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    align-items: center;
+  }
+  .search-input {
+    flex: 1;
+    background: var(--dark3);
+    border: 1px solid var(--dark4);
+    border-radius: 5px;
+    padding: 9px 12px;
+    font-size: 14px;
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-input:focus { border-color: var(--orange); }
+  .search-input::placeholder { color: var(--muted); }
+
+  .region-filters {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .rfbtn {
+    background: var(--dark3);
+    border: 1px solid var(--dark4);
+    border-radius: 4px;
+    color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .rfbtn.active { background: var(--orange); border-color: var(--orange); color: #fff; }
+  .rfbtn:hover:not(.active) { border-color: var(--muted); color: var(--light); }
+
+  /* TEAM LIST */
+  .team-list-wrap {
+    background: var(--dark2);
+    border-radius: 6px;
+    border: 1px solid var(--dark4);
+    overflow: hidden;
+  }
+  .team-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--dark4);
+    transition: background 0.1s;
+  }
+  .team-row:last-child { border-bottom: none; }
+  .team-row:hover:not(.drafted) { background: var(--dark3); }
+  .team-row.drafted { opacity: 0.32; pointer-events: none; }
+  .seed-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--dark4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .seed-1 { background: #1a2a1a; color: var(--green); }
+  .seed-2 { background: #1c2535; color: #6aaaf0; }
+  .seed-3 { background: #252015; color: var(--gold); }
+  .seed-low { background: #2a1a1a; color: #e07070; }
+
+  .team-info { flex: 1; min-width: 0; }
+  .team-nm { font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .team-region { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .team-owner { font-size: 11px; color: var(--orange); margin-top: 1px; }
+
+  .draft-btn {
+    background: var(--orange);
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .draft-btn:hover { background: var(--orange-dim); }
+  .draft-btn:active { transform: scale(0.97); }
+  .auto-btn {
+    background: transparent;
+    border: 1px solid var(--dark4);
+    border-radius: 4px;
+    color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .auto-btn:hover { border-color: var(--muted); color: var(--light); }
+
+  /* CURRENT PLAYER PICKS SIDEBAR */
+  .sidebar-card {
+    background: var(--dark2);
+    border: 1px solid var(--dark4);
+    border-radius: 6px;
+    padding: 14px;
+    position: sticky;
+    top: 72px;
+  }
+  .sidebar-player-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--orange);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .sidebar-player-name { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; text-transform: uppercase; }
+  .sidebar-player-sub { font-size: 12px; color: var(--muted); }
+
+  .pick-slot {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--dark4);
+  }
+  .pick-slot:last-child { border-bottom: none; }
+  .pick-slot-num { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; color: var(--muted); width: 18px; text-align: center; }
+  .pick-slot-team { font-size: 13px; font-weight: 500; }
+  .pick-slot-empty { font-size: 13px; color: var(--dark4); }
+  .pick-slot-seed { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; color: var(--muted); margin-right: auto; }
+
+  /* BOARD VIEW */
+  .board-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+  .board-card {
+    background: var(--dark2);
+    border: 1px solid var(--dark4);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .board-card.active-turn { border-color: var(--orange); }
+  .board-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--dark4);
+    background: var(--dark3);
+  }
+  .board-draft-order { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; color: var(--muted); }
+  .board-player-name { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; text-transform: uppercase; flex: 1; }
+  .board-pick-count { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; color: var(--muted); }
+  .board-clock-tag {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--orange);
+    color: #fff;
+    padding: 2px 7px;
+    border-radius: 3px;
+  }
+  .board-picks { padding: 8px 12px; }
+  .board-pick-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--dark4);
+    font-size: 13px;
+  }
+  .board-pick-row:last-child { border-bottom: none; }
+  .board-pick-seed { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; color: var(--muted); width: 20px; text-align: center; }
+  .board-pick-name { flex: 1; }
+  .board-pick-region { font-size: 11px; color: var(--muted); }
+  .empty-pick-row { font-size: 12px; color: var(--dark4); padding: 4px 0; }
+
+  /* HISTORY */
+  .history-list { background: var(--dark2); border: 1px solid var(--dark4); border-radius: 6px; overflow: hidden; }
+  .history-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--dark4);
+    font-size: 13px;
+  }
+  .history-row:last-child { border-bottom: none; }
+  .history-pick-num { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; color: var(--muted); width: 32px; }
+  .history-player { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; width: 90px; }
+  .history-team { flex: 1; }
+  .history-seed { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; color: var(--muted); }
+
+  /* CONFIRM MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--dark2);
+    border: 1px solid var(--dark4);
+    border-radius: 8px;
+    padding: 24px;
+    width: 340px;
+    max-width: 90vw;
+  }
+  .modal-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+  .modal-team-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--orange);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .modal-team-meta { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 10px; }
+  .modal-confirm {
+    flex: 1;
+    background: var(--orange);
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .modal-confirm:hover { background: var(--orange-dim); }
+  .modal-cancel {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--dark4);
+    border-radius: 5px;
+    color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .modal-cancel:hover { border-color: var(--muted); color: var(--light); }
+
+  /* EMPTY STATE */
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
+
+  /* SAVING INDICATOR */
+  .save-indicator {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    background: var(--dark3);
+    border: 1px solid var(--dark4);
+    border-radius: 5px;
+    padding: 8px 14px;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 300;
+  }
+  .save-indicator.show { opacity: 1; }
+
+  /* RESET MODAL */
+  .reset-btn {
+    background: transparent;
+    border: 1px solid var(--mid);
+    border-radius: 4px;
+    color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .reset-btn:hover { border-color: #c0392b; color: #e74c3c; }
+  .modal-confirm.danger { background: #c0392b; }
+  .modal-confirm.danger:hover { background: #a93226; }
+
+  /* TEAMS / PRINT TAB */
+  .print-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .print-btn {
+    background: transparent;
+    border: 1px solid var(--dark4);
+    border-radius: 4px;
+    color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .print-btn:hover { border-color: var(--muted); color: var(--light); }
+  .teams-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .teams-table th {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--dark4);
+    background: var(--dark2);
+  }
+  .teams-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--dark4);
+    vertical-align: middle;
+  }
+  .teams-table tr:last-child td { border-bottom: none; }
+  .teams-table tr.available:hover td { background: var(--dark3); }
+  .teams-table tr.taken td { opacity: 0.35; }
+  .teams-table .rank-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    width: 36px;
+  }
+  .teams-table .team-seed-col {
+    width: 50px;
+  }
+  .teams-table .taken-tag {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--dark4);
+    color: var(--muted);
+    padding: 2px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+  .show-toggle {
+    display: flex;
+    gap: 4px;
+    background: var(--dark2);
+    border-radius: 5px;
+    padding: 3px;
+  }
+  .show-toggle button {
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+    color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .show-toggle button.active { background: var(--dark4); color: var(--white); }
+
+  /* PRINT STYLES */
+  @media print {
+    .site-header, .tabs, #clock-area, .print-bar, .show-toggle,
+    #tab-content-pick, #tab-content-board, #tab-content-history,
+    .save-indicator, .modal-overlay { display: none !important; }
+    #tab-content-teams { display: block !important; }
+    body { background: #fff; color: #000; font-family: sans-serif; }
+    .main { padding: 0; max-width: 100%; }
+    .print-header { display: block !important; }
+    .teams-table { font-size: 12px; }
+    .teams-table th { background: #f0f0f0; color: #444; border-bottom: 1px solid #ccc; }
+    .teams-table td { border-bottom: 1px solid #eee; padding: 6px 10px; color: #000; }
+    .teams-table tr.taken td { opacity: 1; color: #aaa; }
+    .seed-circle { background: #eee !important; color: #333 !important; border: 1px solid #ccc; }
+    .taken-tag { background: #eee !important; color: #999 !important; border: 1px solid #ccc; }
+  }
+  .print-header { display: none; }
+
+  /* RESPONSIVE */
+  @media (max-width: 500px) {
+    .site-header { padding: 0 1rem; }
+    .main { padding: 1rem 0.75rem; }
+    .on-clock-banner .picker-name { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-title">March <span>Madness</span> Draft <span style="color:var(--muted);font-weight:400;font-size:16px">2026</span></div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div id="header-status" class="round-badge waiting">Loading...</div>
+    <button class="reset-btn" onclick="openResetModal()">Reset</button>
+  </div>
+</header>
+
+<div class="main">
+
+  <div id="clock-area"></div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('pick',this)" id="tab-pick">Draft Pick</button>
+    <button class="tab-btn" onclick="switchTab('board',this)" id="tab-board">Board</button>
+    <button class="tab-btn" onclick="switchTab('history',this)" id="tab-history">History</button>
+    <button class="tab-btn" onclick="switchTab('teams',this)" id="tab-teams">Teams</button>
+  </div>
+
+  <div id="tab-content-pick">
+    <div class="pick-layout">
+      <div>
+        <div class="search-bar">
+          <input class="search-input" id="search" placeholder="Search teams..." oninput="renderTeamList()">
+          <button class="auto-btn" onclick="autoDraft()">Auto-draft</button>
+        </div>
+        <div class="region-filters" id="region-filters">
+          <button class="rfbtn active" onclick="setRegion('All',this)">All</button>
+          <button class="rfbtn" onclick="setRegion('East',this)">East</button>
+          <button class="rfbtn" onclick="setRegion('West',this)">West</button>
+          <button class="rfbtn" onclick="setRegion('South',this)">South</button>
+          <button class="rfbtn" onclick="setRegion('Midwest',this)">Midwest</button>
+        </div>
+        <div class="team-list-wrap" id="team-list"></div>
+      </div>
+      <div>
+        <div class="section-label">Current pick</div>
+        <div class="sidebar-card" id="sidebar-picks"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-content-board" style="display:none">
+    <div class="board-grid" id="board-view"></div>
+  </div>
+
+  <div id="tab-content-history" style="display:none">
+    <div class="section-label">Pick history</div>
+    <div class="history-list" id="history-view"></div>
+  </div>
+
+  <div id="tab-content-teams" style="display:none">
+    <div class="print-header" id="print-header">
+      <div style="font-family:sans-serif;margin-bottom:12px">
+        <div style="font-size:20px;font-weight:700">March Madness Draft 2026 — Available Teams</div>
+        <div style="font-size:12px;color:#666;margin-top:4px">Sorted by overall ranking (seed 1 = best). Taken teams shown greyed out.</div>
+      </div>
+    </div>
+    <div class="print-bar">
+      <div class="show-toggle">
+        <button class="active" id="toggle-all" onclick="setTeamsFilter('all',this)">All teams</button>
+        <button id="toggle-available" onclick="setTeamsFilter('available',this)">Available only</button>
+      </div>
+      <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+    </div>
+    <div style="background:var(--dark2);border:1px solid var(--dark4);border-radius:6px;overflow:hidden">
+      <table class="teams-table">
+        <thead>
+          <tr>
+            <th class="rank-num">#</th>
+            <th class="team-seed-col">Seed</th>
+            <th>Team</th>
+            <th>Region</th>
+            <th>Exp. Score</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="teams-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <div class="modal-title">Confirm pick</div>
+    <div class="modal-sub" id="modal-picker-line"></div>
+    <div class="modal-team-name" id="modal-team-name"></div>
+    <div class="modal-team-meta" id="modal-team-meta"></div>
+    <div class="modal-actions">
+      <button class="modal-confirm" onclick="confirmPick()">Draft this team</button>
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESET MODAL -->
+<div class="modal-overlay" id="reset-modal">
+  <div class="modal-box">
+    <div class="modal-title">Reset draft?</div>
+    <div class="modal-sub">This will erase all picks and restart from pick #1. This cannot be undone.</div>
+    <div style="background:var(--dark3);border-radius:5px;padding:12px 14px;margin-bottom:20px;font-size:13px;color:var(--muted)">
+      <strong style="color:var(--white);display:block;margin-bottom:4px">Current progress</strong>
+      <span id="reset-modal-progress"></span>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-confirm danger" onclick="confirmReset()">Yes, reset draft</button>
+      <button class="modal-cancel" onclick="closeResetModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="save-indicator" id="save-indicator">Saving...</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, onValue, set } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+let db = null;
+let dbRef = null;
+
+
+function setSyncStatus(s){
+  const el=document.getElementById('save-indicator');
+  if(!el)return;
+  if(s==='saving'){el.textContent='Saving...';el.classList.add('show');}
+  else if(s==='live'){el.textContent='Saved';el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),1800);}
+  else if(s==='error'){el.textContent='Save failed';el.classList.add('show');}
+}
+
+const DRAFT_ORDER = ["Robert","Ernesto","Efren","James","Antonio","Luis C","Arturo","Albert"];
+const PICKS_PER_PLAYER = 8;
+const TOTAL_PICKS = DRAFT_ORDER.length * PICKS_PER_PLAYER;
+// Firebase used instead of window.storage
+
+const TEAMS = [
+  // EAST
+  {seed:1, name:"Duke",             region:"East"},
+  {seed:2, name:"UConn",            region:"East"},
+  {seed:3, name:"Michigan St.",     region:"East"},
+  {seed:4, name:"Kansas",           region:"East"},
+  {seed:5, name:"St. John's",       region:"East"},
+  {seed:6, name:"Louisville",       region:"East"},
+  {seed:7, name:"UCLA",             region:"East"},
+  {seed:8, name:"Ohio St.",         region:"East"},
+  {seed:9, name:"TCU",              region:"East"},
+  {seed:10,name:"UCF",              region:"East"},
+  {seed:11,name:"South Florida",    region:"East"},
+  {seed:12,name:"Northern Iowa",    region:"East"},
+  {seed:13,name:"Cal Baptist",      region:"East"},
+  {seed:14,name:"North Dakota St.", region:"East"},
+  {seed:15,name:"Furman",           region:"East"},
+  {seed:16,name:"Siena",            region:"East"},
+  // WEST
+  {seed:1, name:"Arizona",          region:"West"},
+  {seed:2, name:"Purdue",           region:"West"},
+  {seed:3, name:"Gonzaga",          region:"West"},
+  {seed:4, name:"Arkansas",         region:"West"},
+  {seed:5, name:"Wisconsin",        region:"West"},
+  {seed:6, name:"BYU",              region:"West"},
+  {seed:7, name:"Miami (FL)",       region:"West"},
+  {seed:8, name:"Villanova",        region:"West"},
+  {seed:9, name:"Utah St.",         region:"West"},
+  {seed:10,name:"Missouri",         region:"West"},
+  {seed:11,name:"Texas/NC State",   region:"West"},
+  {seed:12,name:"High Point",       region:"West"},
+  {seed:13,name:"Hawaii",           region:"West"},
+  {seed:14,name:"Kennesaw St.",     region:"West"},
+  {seed:15,name:"Queens",           region:"West"},
+  {seed:16,name:"LIU",              region:"West"},
+  // MIDWEST
+  {seed:1, name:"Michigan",         region:"Midwest"},
+  {seed:2, name:"Iowa St.",         region:"Midwest"},
+  {seed:3, name:"Virginia",         region:"Midwest"},
+  {seed:4, name:"Alabama",          region:"Midwest"},
+  {seed:5, name:"Texas Tech",       region:"Midwest"},
+  {seed:6, name:"Tennessee",        region:"Midwest"},
+  {seed:7, name:"Kentucky",         region:"Midwest"},
+  {seed:8, name:"Georgia",          region:"Midwest"},
+  {seed:9, name:"Saint Louis",      region:"Midwest"},
+  {seed:10,name:"Santa Clara",      region:"Midwest"},
+  {seed:11,name:"SMU/Miami (OH)",   region:"Midwest"},
+  {seed:12,name:"Akron",            region:"Midwest"},
+  {seed:13,name:"Hofstra",          region:"Midwest"},
+  {seed:14,name:"Wright St.",       region:"Midwest"},
+  {seed:15,name:"Tennessee St.",    region:"Midwest"},
+  {seed:16,name:"UMBC/Howard",      region:"Midwest"},
+  // SOUTH
+  {seed:1, name:"Florida",          region:"South"},
+  {seed:2, name:"Houston",          region:"South"},
+  {seed:3, name:"Illinois",         region:"South"},
+  {seed:4, name:"Nebraska",         region:"South"},
+  {seed:5, name:"Vanderbilt",       region:"South"},
+  {seed:6, name:"North Carolina",   region:"South"},
+  {seed:7, name:"Saint Mary's",     region:"South"},
+  {seed:8, name:"Clemson",          region:"South"},
+  {seed:9, name:"Iowa",             region:"South"},
+  {seed:10,name:"Texas A&M",        region:"South"},
+  {seed:11,name:"VCU",              region:"South"},
+  {seed:12,name:"McNeese",          region:"South"},
+  {seed:13,name:"Troy",             region:"South"},
+  {seed:14,name:"Penn",             region:"South"},
+  {seed:15,name:"Idaho",            region:"South"},
+  {seed:16,name:"Pra. View/Lehigh", region:"South"}
+];
+
+let state = { picks: [], currentPickIndex: 0 };
+let activeRegion = 'All';
+let pendingTeam = null;
+let activeTab = 'pick';
+let teamsFilter = 'all';
+
+function teamKey(t) { return t.region + '-' + t.seed + '-' + t.name; }
+
+function saveState() {
+  if(dbRef){
+    setSyncStatus('saving');
+    set(dbRef, state).then(()=>setSyncStatus('live')).catch(()=>setSyncStatus('error'));
+  }
+}
+
+// showSaveIndicator handled by setSyncStatus
+
+function loadState() {
+  try {
+    const config = {
+  apiKey: "AIzaSyAenUZicTyg52LDQ1y-K1ngnvSbIFF7cdU",
+  authDomain: "marchmadness2026-232c7.firebaseapp.com",
+  databaseURL: "https://marchmadness2026-232c7-default-rtdb.firebaseio.com",
+  projectId: "marchmadness2026-232c7",
+  storageBucket: "marchmadness2026-232c7.firebasestorage.app",
+  messagingSenderId: "105483230366",
+  appId: "1:105483230366:web:2d0f21cc8fc737d7ae2f8f"
+};
+    const app = initializeApp(config, 'draft-app');
+    db = getDatabase(app);
+    dbRef = ref(db, 'draft2026');
+    onValue(dbRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data && data.picks !== undefined) state = data;
+      render();
+    });
+  } catch(e) { console.error('Firebase init failed:', e); }
+}
+
+
+function getSnakePicker(idx) {
+  const round = Math.floor(idx / DRAFT_ORDER.length);
+  const pos = idx % DRAFT_ORDER.length;
+  return round % 2 === 0 ? DRAFT_ORDER[pos] : DRAFT_ORDER[DRAFT_ORDER.length - 1 - pos];
+}
+
+function isDraftComplete() { return state.currentPickIndex >= TOTAL_PICKS; }
+
+function getDraftedKeys() {
+  const s = new Set();
+  state.picks.forEach(p => s.add(teamKey(p.team)));
+  return s;
+}
+
+function getPicksByPlayer() {
+  const map = {};
+  DRAFT_ORDER.forEach(p => map[p] = []);
+  state.picks.forEach(p => map[p.player].push(p.team));
+  return map;
+}
+
+function currentPicker() {
+  if (isDraftComplete()) return null;
+  return getSnakePicker(state.currentPickIndex);
+}
+
+function initials(name) {
+  return name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+}
+
+function seedClass(seed) {
+  if (seed === 1) return 'seed-1';
+  if (seed === 2) return 'seed-2';
+  if (seed === 3) return 'seed-3';
+  if (seed >= 13) return 'seed-low';
+  return '';
+}
+
+function render() {
+  renderClockArea();
+  renderHeaderStatus();
+  if (activeTab === 'pick') { renderTeamList(); renderSidebar(); }
+  if (activeTab === 'board') renderBoard();
+  if (activeTab === 'history') renderHistory();
+  if (activeTab === 'teams') renderTeamsTable();
+}
+
+function renderClockArea() {
+  const el = document.getElementById('clock-area');
+  if (isDraftComplete()) {
+    el.innerHTML = '<div class="done-banner">Draft complete — all picks are in!</div>';
+    return;
+  }
+  const picker = currentPicker();
+  const round = Math.floor(state.currentPickIndex / DRAFT_ORDER.length) + 1;
+  const pickInRound = (state.currentPickIndex % DRAFT_ORDER.length) + 1;
+  el.innerHTML = `
+    <div class="on-clock-banner">
+      <div>
+        <div class="label">On the clock</div>
+        <div class="picker-name">${picker}</div>
+      </div>
+      <div class="pick-info">
+        Round ${round} of ${PICKS_PER_PLAYER}<br>
+        Pick ${state.currentPickIndex + 1} of ${TOTAL_PICKS}
+      </div>
+    </div>`;
+}
+
+function renderHeaderStatus() {
+  const el = document.getElementById('header-status');
+  if (isDraftComplete()) {
+    el.textContent = 'Draft Complete';
+    el.className = 'round-badge done';
+  } else {
+    const round = Math.floor(state.currentPickIndex / DRAFT_ORDER.length) + 1;
+    el.textContent = `Round ${round}`;
+    el.className = 'round-badge';
+  }
+}
+
+function renderTeamList() {
+  const drafted = getDraftedKeys();
+  const search = document.getElementById('search').value.toLowerCase();
+  const list = document.getElementById('team-list');
+  
+  let teams = TEAMS.filter(t => {
+    if (activeRegion !== 'All' && t.region !== activeRegion) return false;
+    if (search && !t.name.toLowerCase().includes(search) && !t.region.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  if (teams.length === 0) {
+    list.innerHTML = '<div class="empty-state">No teams match your search</div>';
+    return;
+  }
+
+  const byPlayer = getPicksByPlayer();
+  const isDone = isDraftComplete();
+
+  list.innerHTML = teams.map(t => {
+    const key = teamKey(t);
+    const isTaken = drafted.has(key);
+    const globalIdx = TEAMS.indexOf(t);
+    let owner = '';
+    if (isTaken) {
+      for (const [player, pts] of Object.entries(byPlayer)) {
+        if (pts.some(p => teamKey(p) === key)) { owner = player; break; }
+      }
+    }
+    return `<div class="team-row${isTaken ? ' drafted' : ''}">
+      <div class="seed-circle ${seedClass(t.seed)}">${t.seed}</div>
+      <div class="team-info">
+        <div class="team-nm">${t.name}</div>
+        <div class="team-region">${t.region} region</div>
+        ${isTaken ? `<div class="team-owner">${owner}</div>` : ''}
+      </div>
+      ${!isTaken && !isDone ? `<button class="draft-btn" onclick="openModalByIndex(${globalIdx})">Draft</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderSidebar() {
+  const el = document.getElementById('sidebar-picks');
+  const picker = currentPicker();
+  if (!picker) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:14px;text-align:center;padding:20px">Draft complete!</div>';
+    return;
+  }
+  const byPlayer = getPicksByPlayer();
+  const myPicks = byPlayer[picker] || [];
+  const slots = Array.from({length: PICKS_PER_PLAYER}, (_,i) => myPicks[i] || null);
+  el.innerHTML = `
+    <div class="sidebar-player-header">
+      <div class="avatar">${initials(picker)}</div>
+      <div>
+        <div class="sidebar-player-name">${picker}</div>
+        <div class="sidebar-player-sub">${myPicks.length}/${PICKS_PER_PLAYER} picks</div>
+      </div>
+    </div>
+    ${slots.map((t,i) => t
+      ? `<div class="pick-slot"><span class="pick-slot-num">${i+1}</span><span class="pick-slot-team">${t.name}</span><span class="pick-slot-seed">${t.seed}</span></div>`
+      : `<div class="pick-slot"><span class="pick-slot-num">${i+1}</span><span class="pick-slot-empty">—</span></div>`
+    ).join('')}`;
+}
+
+function renderBoard() {
+  const el = document.getElementById('board-view');
+  const byPlayer = getPicksByPlayer();
+  const picker = currentPicker();
+  el.innerHTML = DRAFT_ORDER.map((player, idx) => {
+    const pts = byPlayer[player] || [];
+    const isCurrent = player === picker;
+    const emptyCount = PICKS_PER_PLAYER - pts.length;
+    const pickRows = pts.map(t => `
+      <div class="board-pick-row">
+        <span class="board-pick-seed">${t.seed}</span>
+        <span class="board-pick-name">${t.name}</span>
+        <span class="board-pick-region">${t.region}</span>
+      </div>`).join('');
+    const emptyRows = Array(emptyCount).fill('<div class="empty-pick-row">—</div>').join('');
+    return `<div class="board-card${isCurrent ? ' active-turn' : ''}">
+      <div class="board-card-header">
+        <div>
+          <div class="board-draft-order">Pick #${idx+1}</div>
+          <div class="board-player-name">${player}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
+          ${isCurrent ? '<span class="board-clock-tag">On clock</span>' : ''}
+          <span class="board-pick-count">${pts.length}/${PICKS_PER_PLAYER}</span>
+        </div>
+      </div>
+      <div class="board-picks">${pickRows}${emptyRows}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderHistory() {
+  const el = document.getElementById('history-view');
+  if (state.picks.length === 0) {
+    el.innerHTML = '<div class="empty-state">No picks yet</div>';
+    return;
+  }
+  el.innerHTML = [...state.picks].reverse().map((p, ri) => {
+    const i = state.picks.length - 1 - ri;
+    return `<div class="history-row">
+      <span class="history-pick-num">#${i+1}</span>
+      <span class="history-player">${p.player}</span>
+      <span class="history-team">${p.team.name}</span>
+      <span class="history-seed">Seed ${p.team.seed} · ${p.team.region}</span>
+    </div>`;
+  }).join('');
+}
+
+function openModalByIndex(idx) {
+  openModal(TEAMS[idx]);
+}
+
+function openModal(team) {
+  if (isDraftComplete()) return;
+  pendingTeam = team;
+  document.getElementById('modal-picker-line').textContent = currentPicker() + ' is drafting:';
+  document.getElementById('modal-team-name').textContent = team.name;
+  document.getElementById('modal-team-meta').textContent = `Seed ${team.seed} · ${team.region} Region`;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  pendingTeam = null;
+}
+
+function confirmPick() {
+  if (!pendingTeam || isDraftComplete()) return;
+  const drafted = getDraftedKeys();
+  if (drafted.has(teamKey(pendingTeam))) { closeModal(); return; }
+  state.picks.push({ player: currentPicker(), team: pendingTeam, pickNum: state.currentPickIndex + 1 });
+  state.currentPickIndex++;
+  saveState();
+  closeModal();
+  render();
+}
+
+// Expected wins per seed based on historical March Madness data (1985-2024).
+// Expected score = seed * expectedWins, which is what this competition scores.
+const EXPECTED_WINS = {
+  1:  3.52,  // ~87% R64, ~79% R32, ~74% S16, ~61% E8, ~51% F4, ~50% NCG
+  2:  2.53,  // strong but frequent upsets in later rounds
+  3:  1.87,
+  4:  1.55,
+  5:  1.08,
+  6:  1.07,
+  7:  0.94,
+  8:  0.85,  // 8/9 matchup is a coin flip; winner faces a 1-seed
+  9:  0.75,
+  10: 0.74,
+  11: 0.70,  // 11-seeds have strong upset history (Final Four appearances)
+  12: 0.66,  // 12 over 5 is the most famous upset seed
+  13: 0.28,
+  14: 0.17,
+  15: 0.09,
+  16: 0.01   // only one 16 has ever beaten a 1 (UMBC 2018)
+};
+
+function expectedScore(seed) {
+  return seed * (EXPECTED_WINS[seed] || 0);
+}
+
+function autoDraft() {
+  if (isDraftComplete()) return;
+  const drafted = getDraftedKeys();
+  const available = TEAMS.filter(t => !drafted.has(teamKey(t)));
+  if (available.length === 0) return;
+  available.sort((a, b) => {
+    const diff = expectedScore(b.seed) - expectedScore(a.seed);
+    return diff !== 0 ? diff : a.name.localeCompare(b.name);
+  });
+  openModal(available[0]);
+}
+
+function setRegion(r, el) {
+  activeRegion = r;
+  document.querySelectorAll('.rfbtn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderTeamList();
+}
+
+function switchTab(tab, el) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-content-pick').style.display = tab === 'pick' ? '' : 'none';
+  document.getElementById('tab-content-board').style.display = tab === 'board' ? '' : 'none';
+  document.getElementById('tab-content-history').style.display = tab === 'history' ? '' : 'none';
+  document.getElementById('tab-content-teams').style.display = tab === 'teams' ? '' : 'none';
+  render();
+}
+
+// OVERALL RANKING: sort by seed asc, then region order for tiebreak
+const REGION_ORDER = ['East','West','South','Midwest'];
+function getOverallRanking() {
+  return [...TEAMS].sort((a, b) => {
+    const diff = expectedScore(b.seed) - expectedScore(a.seed);
+    if (diff !== 0) return diff;
+    return REGION_ORDER.indexOf(a.region) - REGION_ORDER.indexOf(b.region);
+  });
+}
+
+function setTeamsFilter(f, el) {
+  teamsFilter = f;
+  document.querySelectorAll('.show-toggle button').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderTeamsTable();
+}
+
+function renderTeamsTable() {
+  const ranked = getOverallRanking();
+  const drafted = getDraftedKeys();
+  const byPlayer = getPicksByPlayer();
+  const tbody = document.getElementById('teams-table-body');
+  if (!tbody) return;
+
+  let displayRank = 0;
+  const rows = ranked.map((t, i) => {
+    const key = teamKey(t);
+    const isTaken = drafted.has(key);
+    if (teamsFilter === 'available' && isTaken) return '';
+    displayRank++;
+    let owner = '';
+    if (isTaken) {
+      for (const [player, picks] of Object.entries(byPlayer)) {
+        if (picks.some(p => teamKey(p) === key)) { owner = player; break; }
+      }
+    }
+    return `<tr class="${isTaken ? 'taken' : 'available'}">
+      <td class="rank-num" style="color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:13px">${displayRank}</td>
+      <td class="team-seed-col">
+        <div class="seed-circle ${seedClass(t.seed)}" style="width:26px;height:26px;font-size:12px">${t.seed}</div>
+      </td>
+      <td style="font-weight:500">${t.name}</td>
+      <td style="font-size:13px;color:var(--muted)">${t.region}</td>
+      <td style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--gold)">${expectedScore(t.seed).toFixed(1)} pts</td>
+      <td>${isTaken ? `<span class="taken-tag">${owner}</span>` : '<span style="font-size:12px;color:var(--green);font-family:\'Barlow Condensed\',sans-serif;font-weight:700;letter-spacing:0.06em;text-transform:uppercase">Available</span>'}</td>
+    </tr>`;
+  });
+  tbody.innerHTML = rows.join('');
+}
+
+function openResetModal() {
+  const total = state.picks.length;
+  document.getElementById('reset-modal-progress').textContent =
+    total === 0 ? 'No picks made yet.' :
+    `${total} of ${TOTAL_PICKS} picks made (Round ${Math.floor(state.currentPickIndex / DRAFT_ORDER.length) + 1}).`;
+  document.getElementById('reset-modal').classList.add('open');
+}
+
+function closeResetModal() {
+  document.getElementById('reset-modal').classList.remove('open');
+}
+
+function confirmReset() {
+  state = { picks: [], currentPickIndex: 0 };
+  saveState();
+  closeResetModal();
+  render();
+}
+
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+document.getElementById('reset-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeResetModal();
+});
+
+// Firebase onValue handles real-time updates — no polling needed
+loadState();
+</script>
+</body>
+</html>
