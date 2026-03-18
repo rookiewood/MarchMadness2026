@@ -175,9 +175,12 @@
 <div class="app" id="app" style="display:block">
   <header class="site-header">
     <div class="site-title">March <span>Madness</span> <span style="color:var(--muted);font-weight:400;font-size:16px">2026 Tracker</span></div>
-    <div style="display:flex;align-items:center;gap:6px">
-      <span class="sync-dot" id="sync-dot"></span>
-      <span class="sync-label" id="sync-label">Connecting...</span>
+    <div style="display:flex;align-items:center;gap:16px">
+      <a href="bracket.html" style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--orange);text-decoration:none;border:1px solid var(--orange);border-radius:4px;padding:4px 12px;transition:all 0.15s" onmouseover="this.style.background='#E8520A';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#E8520A'">View Bracket</a>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span class="sync-dot" id="sync-dot"></span>
+        <span class="sync-label" id="sync-label">Connecting...</span>
+      </div>
     </div>
   </header>
 
@@ -506,13 +509,13 @@ window.switchTab = function(tab, el) {
 
 // ── BOOT — config hardcoded, no setup screen needed ─────────────────────
 const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyBG-7ob_pE9VeISAQKe9GKWCBFYxovN2jU",
+  apiKey: "AIzaSyAenUZicTyg52LDQ1y-K1ngnvSbIFF7cdU",
   authDomain: "marchmadness2026-232c7.firebaseapp.com",
   databaseURL: "https://marchmadness2026-232c7-default-rtdb.firebaseio.com",
   projectId: "marchmadness2026-232c7",
   storageBucket: "marchmadness2026-232c7.firebasestorage.app",
   messagingSenderId: "105483230366",
-  appId: "1:105483230366:web:0ac944528fdc182aae2f8f"
+  appId: "1:105483230366:web:2d0f21cc8fc737d7ae2f8f"
 };
 initFirebase(FIREBASE_CONFIG);
 </script>
