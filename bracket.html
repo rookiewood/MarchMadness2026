@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+<title>March Madness Bracket 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --orange: #E8520A;
+  --gold: #F5C842;
+  --dark: #0D0D0D;
+  --dark2: #161616;
+  --dark3: #1F1F1F;
+  --dark4: #2A2A2A;
+  --mid: #3A3A3A;
+  --muted: #666;
+  --light: #DEDEDE;
+  --white: #F0F0EB;
+  --green: #2ECC71;
+
+  /* Player colors */
+  --c-robert:  #3B8BEB;
+  --c-ernesto: #E8520A;
+  --c-efren:   #2ECC71;
+  --c-james:   #9B59B6;
+  --c-antonio: #F5C842;
+  --c-luisc:   #E74C3C;
+  --c-arturo:  #1ABC9C;
+  --c-albert:  #E67E22;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  background: var(--dark);
+  color: var(--white);
+  font-family: 'Barlow', sans-serif;
+  min-height: 100vh;
+  overflow-x: auto;
+}
+
+/* HEADER */
+.site-header {
+  background: var(--dark2);
+  border-bottom: 1px solid var(--dark4);
+  padding: 0 1.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 52px; position: sticky; top: 0; z-index: 200;
+}
+.site-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
+}
+.site-title span { color: var(--orange); }
+.sync-dot { width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;margin-right:4px;transition:background 0.3s; }
+.sync-dot.live { background: var(--green); }
+.sync-label { font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted); }
+
+/* LEGEND */
+.legend {
+  display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 1.5rem;
+  background: var(--dark2); border-bottom: 1px solid var(--dark4);
+}
+.legend-item {
+  display: flex; align-items: center; gap: 5px;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700;
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+.legend-dot { width:10px;height:10px;border-radius:50%;flex-shrink:0; }
+
+/* BRACKET LAYOUT */
+.bracket-scroll { overflow-x: auto; padding: 1.5rem; min-width: 100%; }
+.bracket-wrap {
+  display: flex;
+  gap: 0;
+  align-items: flex-start;
+  min-width: 1600px;
+}
+
+/* COLUMNS */
+.bracket-col {
+  display: flex; flex-direction: column;
+  flex-shrink: 0;
+}
+.col-label {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+  text-align: center; padding-bottom: 10px; height: 24px;
+}
+
+/* REGION LABEL */
+.region-label {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 800;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--orange);
+  writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg);
+  padding: 12px 4px; align-self: center;
+  border-left: 2px solid var(--dark4);
+  height: 100%;
+}
+
+/* GAME SLOT */
+.game-slot {
+  display: flex; flex-direction: column;
+  position: relative;
+}
+
+/* TEAM CARD */
+.team-card {
+  background: var(--dark3);
+  border: 1px solid var(--dark4);
+  border-radius: 4px;
+  padding: 5px 8px;
+  display: flex; align-items: center; gap: 6px;
+  width: 168px;
+  cursor: default;
+  transition: border-color 0.15s;
+  position: relative;
+}
+.team-card.winner {
+  background: var(--dark2);
+  border-color: var(--mid);
+}
+.team-card.winner .team-name { color: var(--white); }
+.team-card.eliminated {
+  opacity: 0.38;
+}
+.team-card.tbd {
+  background: var(--dark);
+  border-color: var(--dark4);
+  opacity: 0.5;
+}
+
+.seed-badge {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  width: 16px; text-align: center; flex-shrink: 0;
+}
+.team-info { flex: 1; min-width: 0; }
+.team-name {
+  font-size: 12px; font-weight: 500; color: var(--light);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  line-height: 1.3;
+}
+.owner-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+  text-transform: uppercase; line-height: 1.2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.score-badge {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 700; color: var(--gold);
+  flex-shrink: 0; min-width: 24px; text-align: right;
+}
+
+/* CONNECTOR LINES */
+.connector-right {
+  position: absolute; right: -13px; top: 50%;
+  width: 13px; height: 1px; background: var(--dark4);
+}
+.connector-vert {
+  position: absolute; right: -13px;
+  width: 1px; background: var(--dark4);
+}
+
+/* DIVIDER between top/bottom team in a matchup */
+.matchup-divider { height: 1px; background: var(--dark4); width: 168px; }
+
+/* Spacing between matchups */
+.matchup-gap { flex: 1; }
+
+/* FINAL FOUR CENTER */
+.bracket-center {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 0; flex-shrink: 0; width: 180px;
+}
+.championship-box {
+  background: var(--dark2); border: 1px solid var(--orange);
+  border-radius: 6px; padding: 12px 14px; width: 172px; text-align: center;
+  margin: auto 0;
+}
+.champ-label {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--orange);
+  margin-bottom: 8px;
+}
+.champ-team {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 800;
+  text-transform: uppercase; color: var(--gold); line-height: 1.2;
+}
+.champ-owner {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.04em; text-transform: uppercase; margin-top: 4px;
+}
+.champ-score {
+  font-size: 12px; color: var(--muted); margin-top: 4px;
+}
+
+/* Print */
+@media print {
+  .site-header { position: static; }
+  body { background: #fff; color: #000; }
+  .bracket-scroll { padding: 0.5rem; }
+  .team-card { background: #f8f8f8; border-color: #ddd; }
+  .team-card.eliminated { opacity: 0.3; }
+  .team-name { color: #000; }
+  .col-label { color: #999; }
+  .region-label { color: #E8520A; }
+  .matchup-divider, .connector-vert, .connector-right { background: #ddd; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-title">March <span>Madness</span> 2026 — Bracket</div>
+  <div style="display:flex;align-items:center;gap:6px">
+    <span class="sync-dot" id="sync-dot"></span>
+    <span class="sync-label" id="sync-label">Connecting...</span>
+  </div>
+</header>
+
+<div class="legend" id="legend"></div>
+<div class="bracket-scroll">
+  <div class="bracket-wrap" id="bracket"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+// ── FIREBASE ─────────────────────────────────────────────────────────────
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAenUZicTyg52LDQ1y-K1ngnvSbIFF7cdU",
+  authDomain: "marchmadness2026-232c7.firebaseapp.com",
+  databaseURL: "https://marchmadness2026-232c7-default-rtdb.firebaseio.com",
+  projectId: "marchmadness2026-232c7",
+  storageBucket: "marchmadness2026-232c7.firebasestorage.app",
+  messagingSenderId: "105483230366",
+  appId: "1:105483230366:web:2d0f21cc8fc737d7ae2f8f"
+};
+
+let winsData = {};
+let elimData = {};
+
+const app = initializeApp(FIREBASE_CONFIG, 'bracket-app');
+const db = getDatabase(app);
+const trackerRef = ref(db, 'tracker2026');
+
+onValue(trackerRef, (snapshot) => {
+  const data = snapshot.val();
+  if (data) {
+    winsData = data.winsData || {};
+    elimData = data.elimData || {};
+  }
+  setSyncStatus('live');
+  renderBracket();
+}, () => setSyncStatus('error'));
+
+function setSyncStatus(s) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  if (s === 'live')  { dot.className='sync-dot live'; lbl.textContent='Live'; }
+  else               { dot.className='sync-dot'; lbl.textContent='Offline'; }
+}
+
+// ── DATA ──────────────────────────────────────────────────────────────────
+const PLAYER_COLORS = {
+  'Robert':  '#3B8BEB', 'Ernesto': '#E8520A', 'Efren':   '#2ECC71',
+  'James':   '#9B59B6', 'Antonio': '#F5C842', 'Luis C':  '#E74C3C',
+  'Arturo':  '#1ABC9C', 'Albert':  '#E67E22'
+};
+
+// Each region: matchups in R64 order [top, bottom] pairs
+// seed, name, owner
+const REGIONS = {
+  East: {
+    r64: [
+      [{seed:1,  name:'Duke',            owner:'Robert'},   {seed:16, name:'Siena',           owner:'Ernesto'}],
+      [{seed:8,  name:'Ohio St.',        owner:'Ernesto'},  {seed:9,  name:'TCU',             owner:'Luis C'}],
+      [{seed:5,  name:"St. John's",      owner:'Robert'},   {seed:12, name:'Northern Iowa',   owner:'Antonio'}],
+      [{seed:4,  name:'Kansas',          owner:'James'},    {seed:13, name:'Cal Baptist',     owner:'Ernesto'}],
+      [{seed:6,  name:'Louisville',      owner:'James'},    {seed:11, name:'South Florida',   owner:'Arturo'}],
+      [{seed:3,  name:'Michigan St.',    owner:'Albert'},   {seed:14, name:'North Dakota St.',owner:'Robert'}],
+      [{seed:7,  name:'UCLA',            owner:'Luis C'},   {seed:10, name:'UCF',             owner:'James'}],
+      [{seed:2,  name:'UConn',           owner:'Efren'},    {seed:15, name:'Furman',          owner:'Albert'}],
+    ]
+  },
+  West: {
+    r64: [
+      [{seed:1,  name:'Arizona',         owner:'Robert'},   {seed:16, name:'LIU',             owner:'James'}],
+      [{seed:8,  name:'Villanova',       owner:'Efren'},    {seed:9,  name:'Utah St.',        owner:'Arturo'}],
+      [{seed:5,  name:'Wisconsin',       owner:'Antonio'},  {seed:12, name:'High Point',      owner:'Efren'}],
+      [{seed:4,  name:'Arkansas',        owner:'Efren'},    {seed:13, name:'Hawaii',          owner:'Ernesto'}],
+      [{seed:6,  name:'BYU',             owner:'Antonio'},  {seed:11, name:'Texas/NC State',  owner:'Albert'}],
+      [{seed:3,  name:'Gonzaga',         owner:'Luis C'},   {seed:14, name:'Kennesaw St.',    owner:'Arturo'}],
+      [{seed:7,  name:'Miami (FL)',      owner:'Albert'},   {seed:10, name:'Missouri',        owner:'Arturo'}],
+      [{seed:2,  name:'Purdue',          owner:'Robert'},   {seed:15, name:'Queens',          owner:'Luis C'}],
+    ]
+  },
+  Midwest: {
+    r64: [
+      [{seed:1,  name:'Michigan',        owner:'Luis C'},   {seed:16, name:'UMBC/Howard',     owner:'Robert'}],
+      [{seed:8,  name:'Georgia',         owner:'Ernesto'},  {seed:9,  name:'Saint Louis',     owner:'Antonio'}],
+      [{seed:5,  name:'Texas Tech',      owner:'Arturo'},   {seed:12, name:'Akron',           owner:'Ernesto'}],
+      [{seed:4,  name:'Alabama',         owner:'Ernesto'},  {seed:13, name:'Hofstra',         owner:'Efren'}],
+      [{seed:6,  name:'Tennessee',       owner:'Ernesto'},  {seed:11, name:'SMU/Miami (OH)',  owner:'Luis C'}],
+      [{seed:3,  name:'Virginia',        owner:'Albert'},   {seed:14, name:'Wright St.',      owner:'Albert'}],
+      [{seed:7,  name:'Kentucky',        owner:'Albert'},   {seed:10, name:'Santa Clara',     owner:'Luis C'}],
+      [{seed:2,  name:'Iowa St.',        owner:'Robert'},   {seed:15, name:'Tennessee St.',   owner:'Antonio'}],
+    ]
+  },
+  South: {
+    r64: [
+      [{seed:1,  name:'Florida',         owner:'Antonio'},  {seed:16, name:'Pra. View/Lehigh',owner:'Efren'}],
+      [{seed:8,  name:'Clemson',         owner:'Efren'},    {seed:9,  name:'Iowa',            owner:'James'}],
+      [{seed:5,  name:'Vanderbilt',      owner:'Luis C'},   {seed:12, name:'McNeese',         owner:'James'}],
+      [{seed:4,  name:'Nebraska',        owner:'Antonio'},  {seed:13, name:'Troy',            owner:'James'}],
+      [{seed:6,  name:'North Carolina',  owner:'Efren'},    {seed:11, name:'VCU',             owner:'Albert'}],
+      [{seed:3,  name:'Illinois',        owner:'Arturo'},   {seed:14, name:'Penn',            owner:'Robert'}],
+      [{seed:7,  name:"Saint Mary's",    owner:'Arturo'},   {seed:10, name:'Texas A&M',       owner:'Antonio'}],
+      [{seed:2,  name:'Houston',         owner:'James'},    {seed:15, name:'Idaho',           owner:'Arturo'}],
+    ]
+  }
+};
+
+function teamKey(t) {
+  return `${t.region || ''}_${t.seed}_${t.name.replace(/[^a-zA-Z0-9]/g,'_')}`;
+}
+
+function getWins(name, seed, region) {
+  const k = `${region}_${seed}_${name.replace(/[^a-zA-Z0-9]/g,'_')}`;
+  return winsData[k] || 0;
+}
+
+function isElim(name, seed, region) {
+  const k = `${region}_${seed}_${name.replace(/[^a-zA-Z0-9]/g,'_')}`;
+  return !!elimData[k];
+}
+
+function teamScore(seed, name, region) {
+  return seed * getWins(name, seed, region);
+}
+
+// Determine winner of a matchup based on wins data
+// A team "won" a given round if their wins >= roundNum
+function getRoundWinner(teamA, teamB, regionName, roundNum) {
+  const wA = getWins(teamA.name, teamA.seed, regionName);
+  const wB = getWins(teamB.name, teamB.seed, regionName);
+  if (wA >= roundNum) return { ...teamA, region: regionName };
+  if (wB >= roundNum) return { ...teamB, region: regionName };
+  return null;
+}
+
+// Build advancement data for a region up through E8
+function buildRegionRounds(regionName, r64matchups) {
+  // Returns { r32, s16, e8winner }
+  const r32 = r64matchups.map(([a, b]) => getRoundWinner(a, b, regionName, 1));
+  const s16 = [];
+  for (let i = 0; i < r32.length; i += 2) {
+    const a = r32[i], b = r32[i+1];
+    if (!a || !b) { s16.push(null); continue; }
+    s16.push(getRoundWinner(a, b, regionName, 2));
+  }
+  const e8 = [];
+  for (let i = 0; i < s16.length; i += 2) {
+    const a = s16[i], b = s16[i+1];
+    if (!a || !b) { e8.push(null); continue; }
+    e8.push(getRoundWinner(a, b, regionName, 3));
+  }
+  const e8winner = e8[0] && e8[1] ? getRoundWinner(e8[0], e8[1], regionName, 4) : null;
+  return { r32, s16, e8, e8winner };
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────
+function renderLegend() {
+  const el = document.getElementById('legend');
+  el.innerHTML = Object.entries(PLAYER_COLORS).map(([name, color]) =>
+    `<div class="legend-item">
+      <div class="legend-dot" style="background:${color}"></div>
+      <span style="color:${color}">${name}</span>
+    </div>`
+  ).join('');
+}
+
+function tc(name, seed, regionName, tbd=false) {
+  if (tbd || !name) {
+    return `<div class="team-card tbd">
+      <div class="seed-badge">—</div>
+      <div class="team-info"><div class="team-name" style="color:var(--muted)">TBD</div></div>
+    </div>`;
+  }
+  const owner = findOwner(name, seed, regionName);
+  const color = owner ? PLAYER_COLORS[owner] || 'var(--muted)' : 'var(--muted)';
+  const wins = getWins(name, seed, regionName);
+  const elim = isElim(name, seed, regionName);
+  const score = teamScore(seed, name, regionName);
+  const classes = ['team-card', elim ? 'eliminated' : wins > 0 ? 'winner' : ''].filter(Boolean).join(' ');
+  return `<div class="${classes}">
+    <div class="seed-badge">${seed}</div>
+    <div class="team-info">
+      <div class="team-name">${name}</div>
+      ${owner ? `<div class="owner-name" style="color:${color}">${owner}</div>` : ''}
+    </div>
+    ${score > 0 ? `<div class="score-badge">${score}</div>` : ''}
+  </div>`;
+}
+
+// Build a lookup for owner by name+seed+region
+const OWNER_MAP = {};
+Object.entries(REGIONS).forEach(([regionName, data]) => {
+  data.r64.forEach(([a, b]) => {
+    OWNER_MAP[`${regionName}_${a.seed}_${a.name}`] = a.owner;
+    OWNER_MAP[`${regionName}_${b.seed}_${b.name}`] = b.owner;
+  });
+});
+
+function findOwner(name, seed, regionName) {
+  return OWNER_MAP[`${regionName}_${seed}_${name}`] || null;
+}
+
+// Heights for each round slot spacing (px)
+// R64: 8 matchups → each slot = natural
+// Each subsequent round doubles spacing
+const TEAM_H = 42;   // height of each team card + divider
+const MATCHUP_H = TEAM_H * 2; // two teams
+
+function buildRegionColumn(regionName, side) {
+  // side: 'left' = East/Midwest, 'right' = West/South (mirrored)
+  const data = REGIONS[regionName];
+  const rounds = buildRegionRounds(regionName, data.r64);
+  const { r32, s16, e8, e8winner } = rounds;
+
+  // We'll build column HTML with explicit flex spacers
+  // R64: 8 matchups, each needs spacing
+  // R32: 4 matchups, double spacing
+  // S16: 2 matchups, 4x spacing
+  // E8:  1 matchup,  8x spacing
+  // F4:  1 team slot
+
+  const colW = 182; // team card width + connectors
+  const rounds_data = [
+    { label: 'R64',   teams: data.r64.flat(), matchups: data.r64, spacing: 0 },
+    { label: 'R32',   teams: r32,             matchups: chunkPairs(r32), spacing: MATCHUP_H },
+    { label: 'S16',   teams: s16,             matchups: chunkPairs(s16), spacing: MATCHUP_H * 3 },
+    { label: 'E8',    teams: e8,              matchups: chunkPairs(e8),  spacing: MATCHUP_H * 7 },
+  ];
+
+  // Build each round as a column of matchups with spacers
+  let cols = rounds_data.map((rd, ri) => {
+    const spacerTop = ri === 0 ? 0 : (MATCHUP_H * Math.pow(2, ri) / 2 - MATCHUP_H / 2);
+    const spacerBetween = MATCHUP_H * (Math.pow(2, ri + 1) - 2);
+
+    let html = `<div class="bracket-col" style="width:${colW}px">`;
+    html += `<div class="col-label">${rd.label}</div>`;
+    html += `<div style="display:flex;flex-direction:column">`;
+
+    const matchups = ri === 0 ? data.r64 : chunkPairs(
+      ri === 1 ? r32 : ri === 2 ? s16 : e8
+    );
+
+    matchups.forEach((pair, mi) => {
+      // Top spacer
+      if (mi === 0) html += `<div style="height:${spacerTop}px"></div>`;
+      else html += `<div style="height:${spacerBetween}px"></div>`;
+
+      const [a, b] = Array.isArray(pair) ? pair : [pair, null];
+      const aTeam = a ? a : null;
+      const bTeam = b !== undefined ? b : null;
+
+      html += `<div style="position:relative">`;
+      // Team A
+      if (aTeam) html += tc(aTeam.name, aTeam.seed, aTeam.region || regionName);
+      else html += tc(null, null, regionName, true);
+      // Divider
+      html += `<div class="matchup-divider"></div>`;
+      // Team B
+      if (bTeam) html += tc(bTeam.name, bTeam.seed, bTeam.region || regionName);
+      else html += tc(null, null, regionName, true);
+      // Connector lines
+      if (ri < 3) {
+        const midY = TEAM_H;
+        html += `<div class="connector-right" style="top:${midY}px"></div>`;
+        // Vertical connector spanning to next round's midpoint
+        const halfSpan = (spacerBetween + MATCHUP_H * 2) / 2;
+        if (side === 'left') {
+          html += `<div class="connector-vert" style="right:-13px;top:${TEAM_H}px;height:${halfSpan}px"></div>`;
+        } else {
+          html += `<div class="connector-vert" style="right:-13px;top:${TEAM_H - halfSpan}px;height:${halfSpan}px"></div>`;
+        }
+      }
+      html += `</div>`;
+    });
+
+    html += `</div></div>`;
+    return html;
+  }).join('');
+
+  // F4 slot — just the e8winner
+  const f4spacer = MATCHUP_H * 7 + MATCHUP_H / 2 - TEAM_H / 2;
+  let f4html = `<div class="bracket-col" style="width:${colW}px">`;
+  f4html += `<div class="col-label">F4</div>`;
+  f4html += `<div style="height:${f4spacer}px"></div>`;
+  if (e8winner) f4html += tc(e8winner.name, e8winner.seed, e8winner.region || regionName);
+  else f4html += tc(null, null, regionName, true);
+  f4html += `</div>`;
+
+  cols += f4html;
+
+  return `<div style="display:flex;flex-direction:${side==='right'?'row-reverse':'row'};gap:0">${cols}</div>`;
+}
+
+function chunkPairs(arr) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += 2) out.push([arr[i], arr[i+1] || null]);
+  return out;
+}
+
+// F4 matchups
+function getF4Winners() {
+  const east   = buildRegionRounds('East',    REGIONS.East.r64);
+  const west   = buildRegionRounds('West',    REGIONS.West.r64);
+  const midwest= buildRegionRounds('Midwest', REGIONS.Midwest.r64);
+  const south  = buildRegionRounds('South',   REGIONS.South.r64);
+
+  const f4MatchEast    = east.e8winner;
+  const f4MatchMidwest = midwest.e8winner;
+  const f4MatchWest    = west.e8winner;
+  const f4MatchSouth   = south.e8winner;
+
+  // F4: East vs Midwest, West vs South
+  const ncgLeft  = f4MatchEast && f4MatchMidwest
+    ? getRoundWinner(f4MatchEast, f4MatchMidwest, f4MatchEast.region, 5) : null;
+  const ncgRight = f4MatchWest && f4MatchSouth
+    ? getRoundWinner(f4MatchWest, f4MatchSouth, f4MatchWest.region, 5) : null;
+
+  const champion = ncgLeft && ncgRight
+    ? getRoundWinner(ncgLeft, ncgRight, ncgLeft.region, 6) : null;
+
+  return { f4MatchEast, f4MatchMidwest, f4MatchWest, f4MatchSouth, ncgLeft, ncgRight, champion };
+}
+
+function renderBracket() {
+  renderLegend();
+  const { f4MatchEast, f4MatchMidwest, f4MatchWest, f4MatchSouth, ncgLeft, ncgRight, champion } = getF4Winners();
+
+  const TEAM_H = 42;
+  const totalH = MATCHUP_H * 16;
+  const centerTopPad = MATCHUP_H * 7 + MATCHUP_H / 2 - TEAM_H / 2;
+
+  // Championship center column
+  const champHtml = `
+    <div style="display:flex;flex-direction:column;width:180px;flex-shrink:0;align-items:center">
+      <div class="col-label" style="width:100%;text-align:center">Championship</div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:${centerTopPad - 60}px">
+
+        <div style="text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">
+          NCG — Left
+        </div>
+        ${ncgLeft ? tc(ncgLeft.name, ncgLeft.seed, ncgLeft.region) : tc(null,null,'East',true)}
+
+        <div style="height:20px;display:flex;align-items:center;justify-content:center">
+          <div style="width:1px;height:100%;background:var(--dark4)"></div>
+        </div>
+
+        <div class="championship-box">
+          <div class="champ-label">🏆 Champion</div>
+          ${champion ? `
+            <div class="champ-team">${champion.name}</div>
+            <div class="champ-owner" style="color:${PLAYER_COLORS[findOwner(champion.name, champion.seed, champion.region)] || 'var(--muted)'}">
+              ${findOwner(champion.name, champion.seed, champion.region) || ''}
+            </div>
+            <div class="champ-score">${teamScore(champion.seed, champion.name, champion.region)} pts</div>
+          ` : `<div class="champ-team" style="color:var(--muted);font-size:13px">TBD</div>`}
+        </div>
+
+        <div style="height:20px;display:flex;align-items:center;justify-content:center">
+          <div style="width:1px;height:100%;background:var(--dark4)"></div>
+        </div>
+
+        <div style="text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">
+          NCG — Right
+        </div>
+        ${ncgRight ? tc(ncgRight.name, ncgRight.seed, ncgRight.region) : tc(null,null,'West',true)}
+      </div>
+    </div>`;
+
+  document.getElementById('bracket').innerHTML =
+    buildRegionColumn('East',    'left') +
+    buildRegionColumn('Midwest', 'left') +
+    champHtml +
+    buildRegionColumn('South',   'right') +
+    buildRegionColumn('West',    'right');
+}
+
+renderBracket();
+</script>
+</body>
+</html>
