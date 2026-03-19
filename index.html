@@ -176,6 +176,7 @@
   <header class="site-header">
     <div class="site-title">March <span>Madness</span> <span style="color:var(--muted);font-weight:400;font-size:16px">2026 Tracker</span></div>
     <div style="display:flex;align-items:center;gap:16px">
+      <a href="march-madness-today.html" style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;border:1px solid var(--dark4);border-radius:4px;padding:4px 12px;transition:all 0.15s" onmouseover="this.style.borderColor='var(--muted)';this.style.color='var(--white)'" onmouseout="this.style.borderColor='var(--dark4)';this.style.color='var(--muted)'">Today's Games</a>
       <a href="bracket.html" style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--orange);text-decoration:none;border:1px solid var(--orange);border-radius:4px;padding:4px 12px;transition:all 0.15s" onmouseover="this.style.background='#E8520A';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#E8520A'">View Bracket</a>
       <div style="display:flex;align-items:center;gap:6px">
         <span class="sync-dot" id="sync-dot"></span>
@@ -187,7 +188,7 @@
   <div class="main">
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('standings',this)">Standings</button>
-      <button class="tab-btn" onclick="switchTab('scores',this)">.</button>
+      <button class="tab-btn" onclick="switchTab('scores',this)">Enter Scores</button>
       <button class="tab-btn" onclick="switchTab('players',this)">By Player</button>
     </div>
     <div id="tab-standings"></div>
@@ -212,7 +213,7 @@ const TEAMS = [
   {seed:2, name:"Iowa St.",        region:"Midwest", owner:"Robert"},
   {seed:1, name:"Duke",            region:"East",    owner:"Robert"},
   {seed:14,name:"North Dakota St.",region:"East",    owner:"Robert"},
-  {seed:16,name:"Howard",          region:"Midwest", owner:"Robert"},
+  {seed:16,name:"UMBC/Howard",     region:"Midwest", owner:"Robert"},
   {seed:12,name:"Akron",           region:"Midwest", owner:"Ernesto"},
   {seed:8, name:"Georgia",         region:"Midwest", owner:"Ernesto"},
   {seed:8, name:"Ohio St.",        region:"East",    owner:"Ernesto"},
@@ -228,7 +229,7 @@ const TEAMS = [
   {seed:4, name:"Arkansas",        region:"West",    owner:"Efren"},
   {seed:2, name:"UConn",           region:"East",    owner:"Efren"},
   {seed:13,name:"Hofstra",         region:"Midwest", owner:"Efren"},
-  {seed:16,name:"Prairie View",    region:"South",   owner:"Efren"},
+  {seed:16,name:"Pra. View/Lehigh",region:"South",   owner:"Efren"},
   {seed:12,name:"McNeese",         region:"South",   owner:"James"},
   {seed:10,name:"UCF",             region:"East",    owner:"James"},
   {seed:9, name:"Iowa",            region:"South",   owner:"James"},
@@ -245,7 +246,7 @@ const TEAMS = [
   {seed:5, name:"Wisconsin",       region:"West",    owner:"Antonio"},
   {seed:1, name:"Florida",         region:"South",   owner:"Antonio"},
   {seed:15,name:"Tennessee St.",   region:"Midwest", owner:"Antonio"},
-  {seed:11,name:"Miami OH",        region:"Midwest", owner:"Luis C"},
+  {seed:11,name:"SMU/Miami (OH)",  region:"Midwest", owner:"Luis C"},
   {seed:10,name:"Santa Clara",     region:"Midwest", owner:"Luis C"},
   {seed:9, name:"TCU",             region:"East",    owner:"Luis C"},
   {seed:7, name:"UCLA",            region:"East",    owner:"Luis C"},
@@ -261,7 +262,7 @@ const TEAMS = [
   {seed:5, name:"Texas Tech",      region:"Midwest", owner:"Arturo"},
   {seed:14,name:"Kennesaw St.",    region:"West",    owner:"Arturo"},
   {seed:15,name:"Idaho",           region:"South",   owner:"Arturo"},
-  {seed:11,name:"Texas",           region:"West",    owner:"Albert"},
+  {seed:11,name:"Texas/NC State",  region:"West",    owner:"Albert"},
   {seed:11,name:"VCU",             region:"South",   owner:"Albert"},
   {seed:7, name:"Kentucky",        region:"Midwest", owner:"Albert"},
   {seed:7, name:"Miami (FL)",      region:"West",    owner:"Albert"},
