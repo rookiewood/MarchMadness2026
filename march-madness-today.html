@@ -342,7 +342,7 @@ const OWNERS = {
   "St. John's|5":      'Robert',
   'Penn|14':           'Robert',
   'North Dakota St.|14': 'Robert',
-  'UMBC/Howard|16':    'Robert',
+  'Howard|16':    'Robert',
 
   'Akron|12':          'Ernesto',
   'Georgia|8':         'Ernesto',
@@ -360,7 +360,7 @@ const OWNERS = {
   'Arkansas|4':        'Efren',
   'UConn|2':           'Efren',
   'Hofstra|13':        'Efren',
-  'Pra. View/Lehigh|16': 'Efren',
+  'Prairie View A&M|16': 'Efren',
 
   'McNeese|12':        'James',
   'UCF|10':            'James',
@@ -380,7 +380,7 @@ const OWNERS = {
   'Florida|1':         'Antonio',
   'Tennessee St.|15':  'Antonio',
 
-  'SMU/Miami (OH)|11': 'Luis C',
+  'Miami (OH)|11': 'Luis C',
   'Santa Clara|10':    'Luis C',
   'TCU|9':             'Luis C',
   'UCLA|7':            'Luis C',
@@ -398,7 +398,7 @@ const OWNERS = {
   'Kennesaw St.|14':   'Arturo',
   'Idaho|15':          'Arturo',
 
-  'Texas/NC State|11': 'Albert',
+  'Texas|11': 'Albert',
   'VCU|11':            'Albert',
   'Kentucky|7':        'Albert',
   'Miami (FL)|7':      'Albert',
@@ -425,8 +425,8 @@ const GAMES = [
   { time:'4:25 PM',  net:'TBS',   region:'West',    teamA:{seed:4,  name:'Arkansas'},       teamB:{seed:13, name:'Hawaii'} },
   // Evening
   { time:'6:50 PM',  net:'TNT',   region:'South',   teamA:{seed:6,  name:'North Carolina'}, teamB:{seed:11, name:'VCU'} },
-  { time:'7:10 PM',  net:'CBS',   region:'Midwest', teamA:{seed:1,  name:'Michigan'},       teamB:{seed:16, name:'UMBC/Howard'} },
-  { time:'7:25 PM',  net:'TBS',   region:'West',    teamA:{seed:6,  name:'BYU'},            teamB:{seed:11, name:'Texas/NC State'} },
+  { time:'7:10 PM',  net:'CBS',   region:'Midwest', teamA:{seed:1,  name:'Michigan'},       teamB:{seed:16, name:'Howard'} },
+  { time:'7:25 PM',  net:'TBS',   region:'West',    teamA:{seed:6,  name:'BYU'},            teamB:{seed:11, name:'Texas'} },
   { time:'7:35 PM',  net:'truTV', region:'South',   teamA:{seed:7,  name:"Saint Mary's"},   teamB:{seed:10, name:'Texas A&M'} },
   { time:'9:20 PM',  net:'TNT',   region:'South',   teamA:{seed:3,  name:'Illinois'},       teamB:{seed:14, name:'Penn'} },
   { time:'9:40 PM',  net:'CBS',   region:'East',    teamA:{seed:7,  name:'UCLA'},           teamB:{seed:10, name:'UCF'} },
@@ -527,16 +527,14 @@ function render() {
     ).join('');
 
   // Group games by time slot (afternoon / evening)
-  const afternoon = GAMES.filter(g => {
-    const h = parseInt(g.time);
-    const pm = g.time.includes('PM');
-    return pm && h < 6;
-  });
-  const evening = GAMES.filter(g => {
-    const h = parseInt(g.time);
-    const pm = g.time.includes('PM');
-    return pm && h >= 6;
-  });
+  // Split afternoon (12pm-5pm) vs evening (6pm+)
+  // Parse hour correctly: "12:15 PM" -> 12, "1:30 PM" -> 1, "6:50 PM" -> 6
+  function isPM6orLater(timeStr) {
+    const h = parseInt(timeStr);
+    return timeStr.includes('PM') && h >= 6 && h !== 12;
+  }
+  const afternoon = GAMES.filter(g => !isPM6orLater(g.time));
+  const evening   = GAMES.filter(g =>  isPM6orLater(g.time));
 
   const container = document.getElementById('games-container');
   container.innerHTML = `
