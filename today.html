@@ -63,6 +63,9 @@ body {
   text-decoration: none; transition: color 0.15s;
 }
 .nav-link:hover { color: var(--orange); }
+.sync-dot.live { background: var(--green2) !important; }
+.sync-dot { transition: background 0.3s; }
+.sync-dot.live { background: var(--green2) !important; }
 
 /* HERO */
 .hero {
@@ -287,10 +290,16 @@ body {
 
 <header class="site-header">
   <div class="site-title">March <span>Madness</span> 2026</div>
-  <div class="nav-links">
-    <a href="index.html" class="nav-link">Tracker</a>
-    <a href="bracket.html" class="nav-link">Bracket</a>
-    <a href="draft.html" class="nav-link">Draft</a>
+  <div style="display:flex;align-items:center;gap:16px">
+    <div style="display:flex;align-items:center;gap:5px">
+      <span class="sync-dot" id="sync-dot" style="width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;transition:background 0.3s"></span>
+      <span id="sync-label" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)">Connecting...</span>
+    </div>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Tracker</a>
+      <a href="bracket.html" class="nav-link">Bracket</a>
+      <a href="draft.html" class="nav-link">Draft</a>
+    </div>
   </div>
 </header>
 
@@ -321,203 +330,258 @@ body {
 
 </div>
 
-<script>
-const PLAYER_COLORS = {
-  'Robert':  '#3B8BEB',
-  'Ernesto': '#E8520A',
-  'Efren':   '#2ECC71',
-  'James':   '#9B59B6',
-  'Antonio': '#F5C842',
-  'Luis C':  '#E74C3C',
-  'Arturo':  '#1ABC9C',
-  'Albert':  '#E67E22'
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAenUZicTyg52LDQ1y-K1ngnvSbIFF7cdU",
+  authDomain: "marchmadness2026-232c7.firebaseapp.com",
+  databaseURL: "https://marchmadness2026-232c7-default-rtdb.firebaseio.com",
+  projectId: "marchmadness2026-232c7",
+  storageBucket: "marchmadness2026-232c7.firebasestorage.app",
+  messagingSenderId: "105483230366",
+  appId: "1:105483230366:web:2d0f21cc8fc737d7ae2f8f"
 };
 
-// owner lookup: "TeamName|seed" → owner
-const OWNERS = {
-  'Duke|1':             'Robert',
-  'Iowa St.|2':        'Robert',
-  'Arizona|1':         'Robert',
-  'Purdue|2':          'Robert',
-  "St. John's|5":      'Robert',
-  'Penn|14':           'Robert',
-  'North Dakota St.|14': 'Robert',
-  'Howard|16':    'Robert',
+const app = initializeApp(FIREBASE_CONFIG, 'today-app');
+const db  = getDatabase(app);
 
-  'Akron|12':          'Ernesto',
-  'Georgia|8':         'Ernesto',
-  'Ohio St.|8':        'Ernesto',
-  'Tennessee|6':       'Ernesto',
-  'Alabama|4':         'Ernesto',
-  'Cal Baptist|13':    'Ernesto',
-  'Hawaii|13':         'Ernesto',
-  'Siena|16':          'Ernesto',
+let winsData = {};
+let elimData = {};
 
-  'High Point|12':     'Efren',
-  'Clemson|8':         'Efren',
-  'Villanova|8':       'Efren',
-  'North Carolina|6':  'Efren',
-  'Arkansas|4':        'Efren',
-  'UConn|2':           'Efren',
-  'Hofstra|13':        'Efren',
-  'Prairie View A&M|16': 'Efren',
+onValue(ref(db, 'tracker2026'), (snapshot) => {
+  const data = snapshot.val();
+  if (data) { winsData = data.winsData || {}; elimData = data.elimData || {}; }
+  setSyncStatus('live');
+  render();
+}, () => setSyncStatus('error'));
 
-  'McNeese|12':        'James',
-  'UCF|10':            'James',
-  'Iowa|9':            'James',
-  'Louisville|6':      'James',
-  'Kansas|4':          'James',
-  'Houston|2':         'James',
-  'Troy|13':           'James',
-  'LIU|16':            'James',
-
-  'Northern Iowa|12':  'Antonio',
-  'Texas A&M|10':      'Antonio',
-  'Saint Louis|9':     'Antonio',
-  'BYU|6':             'Antonio',
-  'Nebraska|4':        'Antonio',
-  'Wisconsin|5':       'Antonio',
-  'Florida|1':         'Antonio',
-  'Tennessee St.|15':  'Antonio',
-
-  'Miami (OH)|11': 'Luis C',
-  'Santa Clara|10':    'Luis C',
-  'TCU|9':             'Luis C',
-  'UCLA|7':            'Luis C',
-  'Gonzaga|3':         'Luis C',
-  'Vanderbilt|5':      'Luis C',
-  'Michigan|1':        'Luis C',
-  'Queens|15':         'Luis C',
-
-  'South Florida|11':  'Arturo',
-  'Missouri|10':       'Arturo',
-  'Utah St.|9':        'Arturo',
-  "Saint Mary's|7":    'Arturo',
-  'Illinois|3':        'Arturo',
-  'Texas Tech|5':      'Arturo',
-  'Kennesaw St.|14':   'Arturo',
-  'Idaho|15':          'Arturo',
-
-  'Texas|11': 'Albert',
-  'VCU|11':            'Albert',
-  'Kentucky|7':        'Albert',
-  'Miami (FL)|7':      'Albert',
-  'Michigan St.|3':    'Albert',
-  'Virginia|3':        'Albert',
-  'Wright St.|14':     'Albert',
-  'Furman|15':         'Albert',
-};
-
-function getOwner(name, seed) {
-  return OWNERS[`${name}|${seed}`] || null;
+function setSyncStatus(s) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  if (!dot) return;
+  dot.className = 'sync-dot' + (s === 'live' ? ' live' : '');
+  lbl.textContent = s === 'live' ? 'Live' : 'Offline';
 }
 
-// All 16 games today with real times and networks
+// ── TEAM KEY (must match tracker's format) ───────────────────────────────
+function teamKey(name, seed, region) {
+  return `${region}_${seed}_${name.replace(/[^a-zA-Z0-9]/g,'_')}`;
+}
+function getWins(name, seed, region) { return winsData[teamKey(name, seed, region)] || 0; }
+function isElim(name, seed, region)  { return !!elimData[teamKey(name, seed, region)]; }
+
+// Determine winner of a matchup: the team with more wins wins,
+// or if both are elim'd the one NOT elim'd, or if one has wins.
+// Simply: winner = team that has wins > 0 AND other team is eliminated,
+// OR team with higher wins when both have some.
+function getMatchResult(gameWithRegion) {
+  const { teamA, teamB, region } = gameWithRegion;
+  const wA = getWins(teamA.name, teamA.seed, region);
+  const wB = getWins(teamB.name, teamB.seed, region);
+  const eA = isElim(teamA.name, teamA.seed, region);
+  const eB = isElim(teamB.name, teamB.seed, region);
+
+  // If neither has data yet, no result
+  if (!eA && !eB && wA === 0 && wB === 0) return null;
+
+  // Winner is the non-eliminated one, or the one with wins
+  if (eA && !eB) return { winner: 'B', loser: 'A' };
+  if (eB && !eA) return { winner: 'A', loser: 'B' };
+  if (wA > 0 && wB === 0) return { winner: 'A', loser: 'B' };
+  if (wB > 0 && wA === 0) return { winner: 'B', loser: 'A' };
+  if (wA > wB) return { winner: 'A', loser: 'B' };
+  if (wB > wA) return { winner: 'B', loser: 'A' };
+  return null;
+}
+
+// ── STATIC DATA ───────────────────────────────────────────────────────────
+const PLAYER_COLORS = {
+  'Robert':  '#3B8BEB', 'Ernesto': '#E8520A', 'Efren':   '#2ECC71',
+  'James':   '#9B59B6', 'Antonio': '#F5C842', 'Luis C':  '#E74C3C',
+  'Arturo':  '#1ABC9C', 'Albert':  '#E67E22'
+};
+
+const OWNERS = {
+  'Duke|1':'Robert',       'Iowa St.|2':'Robert',    'Arizona|1':'Robert',
+  'Purdue|2':'Robert',     "St. John's|5":'Robert',  'Penn|14':'Robert',
+  'North Dakota St.|14':'Robert', 'Howard|16':'Robert',
+  'Akron|12':'Ernesto',    'Georgia|8':'Ernesto',    'Ohio St.|8':'Ernesto',
+  'Tennessee|6':'Ernesto', 'Alabama|4':'Ernesto',    'Cal Baptist|13':'Ernesto',
+  'Hawaii|13':'Ernesto',   'Siena|16':'Ernesto',
+  'High Point|12':'Efren', 'Clemson|8':'Efren',      'Villanova|8':'Efren',
+  'North Carolina|6':'Efren','Arkansas|4':'Efren',   'UConn|2':'Efren',
+  'Hofstra|13':'Efren',    'Prairie View A&M|16':'Efren',
+  'McNeese|12':'James',    'UCF|10':'James',          'Iowa|9':'James',
+  'Louisville|6':'James',  'Kansas|4':'James',        'Houston|2':'James',
+  'Troy|13':'James',       'LIU|16':'James',
+  'Northern Iowa|12':'Antonio','Texas A&M|10':'Antonio','Saint Louis|9':'Antonio',
+  'BYU|6':'Antonio',       'Nebraska|4':'Antonio',    'Wisconsin|5':'Antonio',
+  'Florida|1':'Antonio',   'Tennessee St.|15':'Antonio',
+  'Miami (OH)|11':'Luis C','Santa Clara|10':'Luis C', 'TCU|9':'Luis C',
+  'UCLA|7':'Luis C',       'Gonzaga|3':'Luis C',      'Vanderbilt|5':'Luis C',
+  'Michigan|1':'Luis C',   'Queens|15':'Luis C',
+  'South Florida|11':'Arturo','Missouri|10':'Arturo', 'Utah St.|9':'Arturo',
+  "Saint Mary's|7":'Arturo','Illinois|3':'Arturo',   'Texas Tech|5':'Arturo',
+  'Kennesaw St.|14':'Arturo','Idaho|15':'Arturo',
+  'Texas|11':'Albert',     'VCU|11':'Albert',         'Kentucky|7':'Albert',
+  'Miami (FL)|7':'Albert', 'Michigan St.|3':'Albert', 'Virginia|3':'Albert',
+  'Wright St.|14':'Albert','Furman|15':'Albert',
+};
+
+function getOwner(name, seed) { return OWNERS[`${name}|${seed}`] || null; }
+
 const GAMES = [
-  // 12:15 PM slot
-  { time:'12:15 PM', net:'CBS',   region:'East',    teamA:{seed:8,  name:'Ohio St.'},      teamB:{seed:9,  name:'TCU'} },
-  { time:'12:40 PM', net:'truTV', region:'South',   teamA:{seed:4,  name:'Nebraska'},       teamB:{seed:13, name:'Troy'} },
-  { time:'1:30 PM',  net:'TNT',   region:'East',    teamA:{seed:6,  name:'Louisville'},     teamB:{seed:11, name:'South Florida'} },
-  { time:'1:50 PM',  net:'TBS',   region:'West',    teamA:{seed:5,  name:'Wisconsin'},      teamB:{seed:12, name:'High Point'} },
-  { time:'2:50 PM',  net:'CBS',   region:'East',    teamA:{seed:1,  name:'Duke'},           teamB:{seed:16, name:'Siena'} },
-  { time:'3:15 PM',  net:'truTV', region:'South',   teamA:{seed:5,  name:'Vanderbilt'},     teamB:{seed:12, name:'McNeese'} },
-  { time:'4:05 PM',  net:'TNT',   region:'East',    teamA:{seed:3,  name:'Michigan St.'},   teamB:{seed:14, name:'North Dakota St.'} },
-  { time:'4:25 PM',  net:'TBS',   region:'West',    teamA:{seed:4,  name:'Arkansas'},       teamB:{seed:13, name:'Hawaii'} },
-  // Evening
-  { time:'6:50 PM',  net:'TNT',   region:'South',   teamA:{seed:6,  name:'North Carolina'}, teamB:{seed:11, name:'VCU'} },
-  { time:'7:10 PM',  net:'CBS',   region:'Midwest', teamA:{seed:1,  name:'Michigan'},       teamB:{seed:16, name:'Howard'} },
-  { time:'7:25 PM',  net:'TBS',   region:'West',    teamA:{seed:6,  name:'BYU'},            teamB:{seed:11, name:'Texas'} },
-  { time:'7:35 PM',  net:'truTV', region:'South',   teamA:{seed:7,  name:"Saint Mary's"},   teamB:{seed:10, name:'Texas A&M'} },
-  { time:'9:20 PM',  net:'TNT',   region:'South',   teamA:{seed:3,  name:'Illinois'},       teamB:{seed:14, name:'Penn'} },
-  { time:'9:40 PM',  net:'CBS',   region:'East',    teamA:{seed:7,  name:'UCLA'},           teamB:{seed:10, name:'UCF'} },
-  { time:'9:55 PM',  net:'TBS',   region:'Midwest', teamA:{seed:5,  name:'Texas Tech'},     teamB:{seed:12, name:'Akron'} },
-  { time:'10:10 PM', net:'truTV', region:'West',    teamA:{seed:7,  name:'Miami (FL)'},     teamB:{seed:10, name:'Missouri'} },
+  { time:'12:15 PM', net:'CBS',   region:'East',    teamA:{seed:8,  name:'Ohio St.'},       teamB:{seed:9,  name:'TCU'} },
+  { time:'12:40 PM', net:'truTV', region:'South',   teamA:{seed:4,  name:'Nebraska'},        teamB:{seed:13, name:'Troy'} },
+  { time:'1:30 PM',  net:'TNT',   region:'East',    teamA:{seed:6,  name:'Louisville'},      teamB:{seed:11, name:'South Florida'} },
+  { time:'1:50 PM',  net:'TBS',   region:'West',    teamA:{seed:5,  name:'Wisconsin'},       teamB:{seed:12, name:'High Point'} },
+  { time:'2:50 PM',  net:'CBS',   region:'East',    teamA:{seed:1,  name:'Duke'},            teamB:{seed:16, name:'Siena'} },
+  { time:'3:15 PM',  net:'truTV', region:'South',   teamA:{seed:5,  name:'Vanderbilt'},      teamB:{seed:12, name:'McNeese'} },
+  { time:'4:05 PM',  net:'TNT',   region:'East',    teamA:{seed:3,  name:'Michigan St.'},    teamB:{seed:14, name:'North Dakota St.'} },
+  { time:'4:25 PM',  net:'TBS',   region:'West',    teamA:{seed:4,  name:'Arkansas'},        teamB:{seed:13, name:'Hawaii'} },
+  { time:'6:50 PM',  net:'TNT',   region:'South',   teamA:{seed:6,  name:'North Carolina'},  teamB:{seed:11, name:'VCU'} },
+  { time:'7:10 PM',  net:'CBS',   region:'Midwest', teamA:{seed:1,  name:'Michigan'},        teamB:{seed:16, name:'Howard'} },
+  { time:'7:25 PM',  net:'TBS',   region:'West',    teamA:{seed:6,  name:'BYU'},             teamB:{seed:11, name:'Texas'} },
+  { time:'7:35 PM',  net:'truTV', region:'South',   teamA:{seed:7,  name:"Saint Mary's"},    teamB:{seed:10, name:'Texas A&M'} },
+  { time:'9:20 PM',  net:'TNT',   region:'South',   teamA:{seed:3,  name:'Illinois'},        teamB:{seed:14, name:'Penn'} },
+  { time:'9:40 PM',  net:'CBS',   region:'East',    teamA:{seed:7,  name:'UCLA'},            teamB:{seed:10, name:'UCF'} },
+  { time:'9:55 PM',  net:'TBS',   region:'Midwest', teamA:{seed:5,  name:'Texas Tech'},      teamB:{seed:12, name:'Akron'} },
+  { time:'10:10 PM', net:'truTV', region:'West',    teamA:{seed:7,  name:'Miami (FL)'},      teamB:{seed:10, name:'Missouri'} },
 ];
 
-function netClass(net) {
-  return 'net-' + net.toLowerCase().replace('/','').replace(' ','');
-}
-function netBgClass(net) {
-  return 'net-' + net.toLowerCase().replace('/','').replace(' ','') + '-bg';
-}
+// ── HELPERS ───────────────────────────────────────────────────────────────
+function netClass(net)   { return 'net-' + net.toLowerCase().replace('/','').replace(' ',''); }
+function netBgClass(net) { return netClass(net) + '-bg'; }
 
 function parseTimeET(timeStr) {
-  // Returns a Date object for today at the given ET time
   const [time, period] = timeStr.split(' ');
   let [h, m] = time.split(':').map(Number);
   if (period === 'PM' && h !== 12) h += 12;
   if (period === 'AM' && h === 12) h = 0;
-  // ET offset: currently EDT = UTC-4
   const now = new Date();
-  const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), h + 4, m));
-  return d;
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), h + 4, m));
 }
 
 function getGameStatus(timeStr) {
-  const gameTime = parseTimeET(timeStr);
-  const now = new Date();
-  const diff = gameTime - now;
+  const diff = parseTimeET(timeStr) - new Date();
   if (diff > 0) return 'upcoming';
-  // assume games last ~2.5 hours
   if (diff > -150 * 60 * 1000) return 'live';
   return 'final';
 }
 
-function groupByTime(games) {
-  const groups = {};
-  games.forEach(g => {
-    if (!groups[g.time]) groups[g.time] = [];
-    groups[g.time].push(g);
-  });
-  return groups;
+function isPM6orLater(timeStr) {
+  const h = parseInt(timeStr);
+  return timeStr.includes('PM') && h >= 6 && h !== 12;
 }
 
-function renderTeam(team) {
+// ── RENDER TEAM ROW ───────────────────────────────────────────────────────
+function renderTeam(team, region, result, side) {
   const owner = getOwner(team.name, team.seed);
   const color = owner ? PLAYER_COLORS[owner] : null;
-  return `<div class="team-row${owner ? ' has-owner' : ''}"${owner ? ` style="border-left: 3px solid ${color}; padding-left: 14px;"` : ''}>
-    <div class="seed-num">${team.seed}</div>
-    <div class="team-details">
-      <div class="team-nm">${team.name}</div>
-      <div class="team-owner-row">
-        ${owner
-          ? `<div class="owner-dot" style="background:${color}"></div>
-             <span class="owner-label" style="color:${color}">${owner}</span>`
-          : `<span class="no-owner-label">Undrafted</span>`
-        }
+  const wins  = getWins(team.name, team.seed, region);
+  const pts   = team.seed * wins;
+
+  const isWinner = result && result.winner === side;
+  const isLoser  = result && result.loser  === side;
+
+  let rowStyle = '';
+  let overlayHTML = '';
+  let nameStyle = '';
+  let seedStyle = '';
+
+  if (isWinner) {
+    rowStyle = `background: linear-gradient(90deg, ${color ? color+'18' : '#ffffff0a'} 0%, transparent 100%); border-left: 3px solid ${color || 'var(--green)'}; padding-left: 14px;`;
+    nameStyle = 'font-weight:600;';
+    overlayHTML = `<div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0">
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;background:var(--green);color:#fff;padding:2px 8px;border-radius:12px">WIN</span>
+      ${pts > 0 ? `<span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;color:var(--gold)">+${pts}pts</span>` : ''}
+    </div>`;
+  } else if (isLoser) {
+    rowStyle = 'opacity:0.38; border-left:3px solid var(--dark4); padding-left:14px; text-decoration:none;';
+    nameStyle = 'text-decoration:line-through; color:var(--muted);';
+    overlayHTML = `<span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-left:auto;flex-shrink:0">OUT</span>`;
+  } else if (owner) {
+    rowStyle = `border-left: 3px solid ${color}; padding-left: 14px;`;
+  }
+
+  // Winner player celebration
+  let winnerBannerHTML = '';
+  if (isWinner && owner) {
+    winnerBannerHTML = `<div style="background:${color}18;border-top:1px solid ${color}33;padding:6px 14px 6px 17px;display:flex;align-items:center;gap:7px">
+      <div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></div>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:${color}">${owner} advances! +${pts} pts</span>
+      <span style="font-size:14px;margin-left:2px">🎉</span>
+    </div>`;
+  }
+
+  return `
+    <div class="team-row" style="${rowStyle}">
+      <div class="seed-num" style="${isLoser?'color:var(--muted)':''}">${team.seed}</div>
+      <div class="team-details">
+        <div class="team-nm" style="${nameStyle}">${team.name}</div>
+        <div class="team-owner-row">
+          ${owner
+            ? `<div class="owner-dot" style="background:${isLoser?'var(--muted)':color}"></div>
+               <span class="owner-label" style="color:${isLoser?'var(--muted)':color}">${owner}</span>`
+            : `<span class="no-owner-label">Undrafted</span>`}
+        </div>
       </div>
+      ${overlayHTML}
     </div>
-  </div>`;
+    ${winnerBannerHTML}`;
 }
 
+// ── RENDER GAME CARD ──────────────────────────────────────────────────────
 function renderGame(game) {
-  const ownerA = getOwner(game.teamA.name, game.teamA.seed);
-  const ownerB = getOwner(game.teamB.name, game.teamB.seed);
-  const stakes = [ownerA, ownerB].filter(Boolean);
+  const ownerA  = getOwner(game.teamA.name, game.teamA.seed);
+  const ownerB  = getOwner(game.teamB.name, game.teamB.seed);
+  const stakes  = [ownerA, ownerB].filter(Boolean);
   const hasStake = stakes.length > 0;
-  const status = getGameStatus(game.time);
+  const status  = getGameStatus(game.time);
+  const result  = getMatchResult(game);
+  const isFinal = result !== null;
 
-  return `<div class="game-card ${netClass(game.net)}${hasStake ? ' has-stake' : ''}">
+  // Card border glow for finished games with a drafted winner
+  const winnerOwner = result
+    ? (result.winner === 'A' ? ownerA : ownerB)
+    : null;
+  const winnerColor = winnerOwner ? PLAYER_COLORS[winnerOwner] : null;
+
+  let cardBorderStyle = '';
+  if (isFinal && winnerColor) {
+    cardBorderStyle = ` style="border-color:${winnerColor}55;"`;
+  }
+
+  const statusTag = status === 'live'
+    ? `<span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;background:var(--green);color:#fff;padding:2px 8px;border-radius:10px;animation:pulse 1.5s infinite">LIVE</span>`
+    : isFinal
+    ? `<span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:var(--dark4);color:var(--muted);padding:2px 8px;border-radius:10px">FINAL</span>`
+    : `<span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">${game.time} ET</span>`;
+
+  return `<div class="game-card ${netClass(game.net)}"${cardBorderStyle}>
     <div class="game-card-top">
       <div class="game-region">${game.region} Region</div>
       <div class="game-meta">
+        ${statusTag}
         <span class="network-badge ${netBgClass(game.net)}">${game.net}</span>
       </div>
     </div>
     <div class="game-body">
-      ${renderTeam(game.teamA)}
-      <div class="vs-divider">VS</div>
-      ${renderTeam(game.teamB)}
+      ${renderTeam(game.teamA, game.region, result, 'A')}
+      <div class="vs-divider">${isFinal ? 'FINAL' : 'VS'}</div>
+      ${renderTeam(game.teamB, game.region, result, 'B')}
     </div>
-    ${hasStake ? `<div class="stake-bar">
+    ${!isFinal && hasStake ? `<div class="stake-bar">
       <span class="stake-label">Your teams</span>
       ${stakes.map(o => `<span class="stake-chip" style="background:${PLAYER_COLORS[o]}22;color:${PLAYER_COLORS[o]};border:1px solid ${PLAYER_COLORS[o]}44">${o}</span>`).join('')}
     </div>` : ''}
   </div>`;
 }
 
+// ── RENDER PAGE ───────────────────────────────────────────────────────────
 function render() {
-  // Legend
   document.getElementById('player-legend').innerHTML =
     Object.entries(PLAYER_COLORS).map(([name, color]) =>
       `<div class="legend-item">
@@ -526,36 +590,30 @@ function render() {
       </div>`
     ).join('');
 
-  // Group games by time slot (afternoon / evening)
-  // Split afternoon (12pm-5pm) vs evening (6pm+)
-  // Parse hour correctly: "12:15 PM" -> 12, "1:30 PM" -> 1, "6:50 PM" -> 6
-  function isPM6orLater(timeStr) {
-    const h = parseInt(timeStr);
-    return timeStr.includes('PM') && h >= 6 && h !== 12;
-  }
   const afternoon = GAMES.filter(g => !isPM6orLater(g.time));
   const evening   = GAMES.filter(g =>  isPM6orLater(g.time));
 
-  const container = document.getElementById('games-container');
-  container.innerHTML = `
-    ${renderTimeBlock('Afternoon Games', '12:15 PM – 5:00 PM ET', afternoon)}
-    ${renderTimeBlock('Evening Games',   '6:50 PM – Late ET',     evening)}
-  `;
+  document.getElementById('games-container').innerHTML =
+    renderTimeBlock('Afternoon Games', '12:15 PM – 5:00 PM ET', afternoon) +
+    renderTimeBlock('Evening Games',   '6:50 PM – Late ET',     evening);
 }
 
 function renderTimeBlock(title, subtitle, games) {
-  // Determine block status from first game
   const firstStatus = games.length ? getGameStatus(games[0].time) : 'upcoming';
   const lastStatus  = games.length ? getGameStatus(games[games.length-1].time) : 'upcoming';
   let blockStatus = 'upcoming';
-  if (lastStatus === 'final') blockStatus = 'final';
-  else if (firstStatus === 'live' || firstStatus === 'final') blockStatus = 'live';
+  if (lastStatus === 'final') {
+    const allFinal = games.every(g => getMatchResult(g) !== null || getGameStatus(g.time) === 'final');
+    blockStatus = allFinal ? 'final' : 'live';
+  } else if (firstStatus !== 'upcoming') blockStatus = 'live';
+
+  const finishedCount = games.filter(g => getMatchResult(g) !== null).length;
 
   const statusHTML = blockStatus === 'live'
-    ? '<span class="time-block-status status-live">Live Now</span>'
+    ? `<span class="time-block-status status-live">Live</span>`
     : blockStatus === 'final'
-    ? '<span class="time-block-status status-final">Final</span>'
-    : '<span class="time-block-status status-upcoming">Upcoming</span>';
+    ? `<span class="time-block-status status-final">Final — ${finishedCount}/${games.length} complete</span>`
+    : `<span class="time-block-status status-upcoming">Upcoming</span>`;
 
   return `<div class="time-block">
     <div class="time-block-header">
@@ -566,21 +624,17 @@ function renderTimeBlock(title, subtitle, games) {
       <div class="time-block-line"></div>
       ${statusHTML}
     </div>
-    <div class="games-grid">
-      ${games.map(renderGame).join('')}
-    </div>
+    <div class="games-grid">${games.map(renderGame).join('')}</div>
   </div>`;
 }
 
-// Countdown to first tip-off
+// ── COUNTDOWN ─────────────────────────────────────────────────────────────
 function updateCountdown() {
   const firstTip = parseTimeET('12:15 PM');
-  const now = new Date();
-  const diff = firstTip - now;
-  const bar = document.getElementById('countdown-bar');
+  const diff = firstTip - new Date();
+  const timeEl   = document.getElementById('countdown-time');
   const statusEl = document.getElementById('countdown-status');
-  const timeEl = document.getElementById('countdown-time');
-
+  const bar      = document.getElementById('countdown-bar');
   if (diff <= 0) {
     timeEl.textContent = 'Games are underway!';
     statusEl.innerHTML = '<div class="live-pill">Live</div>';
@@ -593,12 +647,14 @@ function updateCountdown() {
   timeEl.textContent = h > 0
     ? `${h}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`
     : `${m}m ${String(s).padStart(2,'0')}s`;
-  statusEl.innerHTML = '<span style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Until tip-off</span>';
+  statusEl.innerHTML = `<span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Until tip-off</span>`;
 }
 
+// Firebase onValue drives render() — just run countdown timer independently
+setInterval(updateCountdown, 1000);
+// Initial render with empty data while Firebase loads
 render();
 updateCountdown();
-setInterval(() => { updateCountdown(); render(); }, 10000);
 </script>
 </body>
 </html>
