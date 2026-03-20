@@ -305,13 +305,13 @@ body {
 
 <div class="hero">
   <div class="hero-inner">
-    <div class="hero-date">Thursday, March 19, 2026 · First Round · Round of 64</div>
+    <div class="hero-date">Friday, March 20, 2026 · First Round · Round of 64</div>
     <div class="hero-title">Today's<br><em>16 Games</em></div>
     <div class="hero-sub">
-      <span>Buffalo, NY</span>
-      <span>Greenville, SC</span>
-      <span>Oklahoma City, OK</span>
-      <span>Portland, OR</span>
+      <span>Tampa, FL</span>
+      <span>Philadelphia, PA</span>
+      <span>San Diego, CA</span>
+      <span>St. Louis, MO</span>
     </div>
   </div>
 </div>
@@ -433,22 +433,24 @@ const OWNERS = {
 function getOwner(name, seed) { return OWNERS[`${name}|${seed}`] || null; }
 
 const GAMES = [
-  { time:'12:15 PM', net:'CBS',   region:'East',    teamA:{seed:8,  name:'Ohio St.'},       teamB:{seed:9,  name:'TCU'} },
-  { time:'12:40 PM', net:'truTV', region:'South',   teamA:{seed:4,  name:'Nebraska'},        teamB:{seed:13, name:'Troy'} },
-  { time:'1:30 PM',  net:'TNT',   region:'East',    teamA:{seed:6,  name:'Louisville'},      teamB:{seed:11, name:'South Florida'} },
-  { time:'1:50 PM',  net:'TBS',   region:'West',    teamA:{seed:5,  name:'Wisconsin'},       teamB:{seed:12, name:'High Point'} },
-  { time:'2:50 PM',  net:'CBS',   region:'East',    teamA:{seed:1,  name:'Duke'},            teamB:{seed:16, name:'Siena'} },
-  { time:'3:15 PM',  net:'truTV', region:'South',   teamA:{seed:5,  name:'Vanderbilt'},      teamB:{seed:12, name:'McNeese'} },
-  { time:'4:05 PM',  net:'TNT',   region:'East',    teamA:{seed:3,  name:'Michigan St.'},    teamB:{seed:14, name:'North Dakota St.'} },
-  { time:'4:25 PM',  net:'TBS',   region:'West',    teamA:{seed:4,  name:'Arkansas'},        teamB:{seed:13, name:'Hawaii'} },
-  { time:'6:50 PM',  net:'TNT',   region:'South',   teamA:{seed:6,  name:'North Carolina'},  teamB:{seed:11, name:'VCU'} },
-  { time:'7:10 PM',  net:'CBS',   region:'Midwest', teamA:{seed:1,  name:'Michigan'},        teamB:{seed:16, name:'Howard'} },
-  { time:'7:25 PM',  net:'TBS',   region:'West',    teamA:{seed:6,  name:'BYU'},             teamB:{seed:11, name:'Texas'} },
-  { time:'7:35 PM',  net:'truTV', region:'South',   teamA:{seed:7,  name:"Saint Mary's"},    teamB:{seed:10, name:'Texas A&M'} },
-  { time:'9:20 PM',  net:'TNT',   region:'South',   teamA:{seed:3,  name:'Illinois'},        teamB:{seed:14, name:'Penn'} },
-  { time:'9:40 PM',  net:'CBS',   region:'East',    teamA:{seed:7,  name:'UCLA'},            teamB:{seed:10, name:'UCF'} },
-  { time:'9:55 PM',  net:'TBS',   region:'Midwest', teamA:{seed:5,  name:'Texas Tech'},      teamB:{seed:12, name:'Akron'} },
-  { time:'10:10 PM', net:'truTV', region:'West',    teamA:{seed:7,  name:'Miami (FL)'},      teamB:{seed:10, name:'Missouri'} },
+  // Afternoon
+  { time:'12:15 PM', net:'CBS',   region:'Midwest', teamA:{seed:7,  name:'Kentucky'},        teamB:{seed:10, name:'Santa Clara'} },
+  { time:'12:40 PM', net:'truTV', region:'Midwest', teamA:{seed:5,  name:'Texas Tech'},       teamB:{seed:12, name:'Akron'} },
+  { time:'1:35 PM',  net:'TNT',   region:'West',    teamA:{seed:1,  name:'Arizona'},          teamB:{seed:16, name:'LIU'} },
+  { time:'1:50 PM',  net:'TBS',   region:'Midwest', teamA:{seed:3,  name:'Virginia'},         teamB:{seed:14, name:'Wright St.'} },
+  { time:'2:50 PM',  net:'CBS',   region:'Midwest', teamA:{seed:2,  name:'Iowa St.'},         teamB:{seed:15, name:'Tennessee St.'} },
+  { time:'3:15 PM',  net:'truTV', region:'Midwest', teamA:{seed:4,  name:'Alabama'},          teamB:{seed:13, name:'Hofstra'} },
+  { time:'4:10 PM',  net:'TNT',   region:'West',    teamA:{seed:8,  name:'Villanova'},        teamB:{seed:9,  name:'Utah St.'} },
+  { time:'4:25 PM',  net:'TBS',   region:'East',    teamA:{seed:6,  name:'Tennessee'},        teamB:{seed:11, name:'Miami (OH)'} },
+  // Evening
+  { time:'6:50 PM',  net:'TNT',   region:'South',   teamA:{seed:8,  name:'Clemson'},          teamB:{seed:9,  name:'Iowa'} },
+  { time:'7:10 PM',  net:'CBS',   region:'West',    teamA:{seed:5,  name:"St. John's"},       teamB:{seed:12, name:'Northern Iowa'} },
+  { time:'7:25 PM',  net:'TBS',   region:'East',    teamA:{seed:7,  name:'UCLA'},             teamB:{seed:10, name:'UCF'} },
+  { time:'7:35 PM',  net:'truTV', region:'West',    teamA:{seed:2,  name:'Purdue'},           teamB:{seed:15, name:'Queens'} },
+  { time:'9:25 PM',  net:'TNT',   region:'South',   teamA:{seed:1,  name:'Florida'},          teamB:{seed:16, name:'Prairie View A&M'} },
+  { time:'9:45 PM',  net:'CBS',   region:'West',    teamA:{seed:4,  name:'Kansas'},           teamB:{seed:13, name:'Cal Baptist'} },
+  { time:'10:00 PM', net:'TBS',   region:'East',    teamA:{seed:2,  name:'UConn'},            teamB:{seed:15, name:'Furman'} },
+  { time:'10:10 PM', net:'truTV', region:'West',    teamA:{seed:7,  name:'Miami (FL)'},       teamB:{seed:10, name:'Missouri'} },
 ];
 
 // ── HELPERS ───────────────────────────────────────────────────────────────
